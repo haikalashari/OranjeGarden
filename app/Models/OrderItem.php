@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\Order;
+use App\Models\Plant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -15,12 +18,10 @@ class OrderItem extends Model
         'plant_id',
         'scanned_by',
         'quantity',
-        'scanned_qty'
     ];
 
     protected $casts = [
         'quantity' => 'integer',
-        'scanned_qty' => 'integer',
     ];
 
     public $timestamps = false; // Since we're manually using created_at
