@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('contact_no');
             $table->string('email')->unique();
-            $table->string('password');
-            $table->enum('role', ['admin', 'delivery']);
-            $table->timestamps();
+            $table->integer('total_orders')->default(0);
+            $table->decimal('total_spent', 12, 2)->default(0);
+            $table->timestamp('created_at')->useCurrent();
         });
+        
     }
 
     /**
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('customers');
     }
 };
