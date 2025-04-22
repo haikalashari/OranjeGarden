@@ -13,16 +13,21 @@ Route::redirect('/', '/login');
 
 // Login routes
 Route::get('/login', [LoginController::class, 'tampilkanLogin'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+
+Route::get('/register', [LoginController::class, 'tampilkanRegister'])->name('register');
+Route::post('/register', [LoginController::class, 'register'])->name('register.submit');
 
 // Logout route
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'tampilkanDashboard'])->name('dashboard');
+Route::controller(DashboardController::class)->group(function () {
+    Route::get('/dashboard', 'tampilkanDashboard')->name('dashboard.index');
 });
 
-
+// Route::middleware('auth')->group(function () {
+//     Route::get('/dashboard', [DashboardController::class, 'tampilkanDashboard'])->name('dashboard.index');
+// });
 
 Route::controller(PlantController::class)->group(function () {
     Route::get('/dashboard/plant', 'tampilkanDataPlant')->name('dashboard.kelola.plant');

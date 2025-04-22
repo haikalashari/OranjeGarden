@@ -37,6 +37,7 @@ class UserFactory extends Factory
             return [
                 'role' => 'admin',
                 'email' => 'admin@example.com',
+                'password' => Hash::make('admin123'), // Password for admin
             ];
         });
     }
