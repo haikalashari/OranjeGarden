@@ -28,7 +28,7 @@ class OrdersTableSeeder extends Seeder
         Order::create([
             'customer_id' => $customer->id,
             'order_date' => Carbon::today(),
-            'rental_duration' => 7, // 7 days
+            'rental_duration' => 7, 
             'delivery_address' => '123 Main St, Anytown, AN 12345',
             'total_price' => 450000.00,
             'payment_status' => 'paid',
