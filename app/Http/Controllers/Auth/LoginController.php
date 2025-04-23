@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User; 
 
 
 class LoginController extends Controller
@@ -16,17 +17,20 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required']
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
         ]);
-        
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return redirect()->route('dashboard.index');
-        } else {
-            dd('Authentication failed', $credentials, \App\Models\User::where('email', $credentials['email'])->first());
         }
+
+        return back()->withErrors(['Email atau Password Salah']);
     }
 
     public function logout()
@@ -53,6 +57,6 @@ class LoginController extends Controller
 
         User::create($validatedData);
 
-        return redirect('auth.login')->with('success', 'Registrasi berhasil. Silakan login.');
+        return redirect('/login')->with('success', 'Registrasi berhasil. Silakan login.');
     }
 }

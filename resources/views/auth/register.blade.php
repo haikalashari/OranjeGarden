@@ -57,6 +57,14 @@
           <label for="password_confirmation" class="form-label">Konfirmasi Kata Sandi</label>
           <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
         </div>
+        <div class="mb-3">
+          <label for="role" class="form-label">Pilih Role</label>
+          <select class="form-select" id="role" name="role" required>
+            <option value="" disabled selected>Pilih Role</option>
+            <option value="admin">Admin</option>
+            <option value="delivery">Delivery</option>
+          </select>
+        </div>
         @if ($errors->any())
           <div class="alert alert-danger" role="alert">
             <ul>
