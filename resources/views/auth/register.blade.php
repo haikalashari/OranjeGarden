@@ -2,86 +2,89 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register | OranjeGarden</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
   <style>
-    body {
-      background-color: #fff6f0;
-    }
-    .register-box {
-      max-width: 400px;
-      margin: auto;
-      margin-top: 10vh;
-      background-color: white;
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(255, 102, 0, 0.1);
-    }
-    .brand {
-      color: #ff6600;
-      font-weight: 700;
-      font-size: 1.8rem;
-      text-align: center;
-      margin-bottom: 20px;
-    }
     .btn-orange {
-      background-color: #ff6600;
-      color: white;
-    }
-    .btn-orange:hover {
-      background-color: #e65c00;
+      @apply bg-orange-500 text-white hover:bg-orange-600 transition-colors duration-200;
     }
   </style>
 </head>
-<body>
+<body class="bg-orange-50 min-h-screen flex items-center justify-center px-4 font-sans">
 
-  <div class="container">
-    <div class="register-box">
-      <div class="brand">OranjeGarden</div>
-      <form action="{{ route('register.submit') }}" method="POST">
-        @csrf
-        <div class="mb-3">
-          <label for="name" class="form-label">Nama Lengkap</label>
-          <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Kata Sandi</label>
-          <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="mb-3">
-          <label for="password_confirmation" class="form-label">Konfirmasi Kata Sandi</label>
-          <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-        </div>
-        <div class="mb-3">
-          <label for="role" class="form-label">Pilih Role</label>
-          <select class="form-select" id="role" name="role" required>
-            <option value="" disabled selected>Pilih Role</option>
-            <option value="admin">Admin</option>
-            <option value="delivery">Delivery</option>
-          </select>
-        </div>
-        @if ($errors->any())
-          <div class="alert alert-danger" role="alert">
-            <ul>
-              @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-              @endforeach
-            </ul>
-          </div>
-        @endif
-        <div class="d-grid">
-          <button type="submit" class="btn btn-orange">Daftar</button>
-        </div>
-        <div class="text-center mt-3">
-          <small>Sudah punya akun? <a href="/login" style="color:#ff6600;">Masuk di sini</a></small>
-        </div>
-      </form>
+  <div class="w-full max-w-lg bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-6">
+    <!-- Brand -->
+    <div class="text-center">
+      <h1 class="text-3xl font-extrabold text-orange-500 tracking-wide">OranjeGarden</h1>
     </div>
+
+    <!-- Form -->
+    <form action="{{ route('register.submit') }}" method="POST" class="space-y-4">
+      @csrf
+
+      <!-- Nama Lengkap -->
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+        <input type="text" id="name" name="name" required
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none focus:border-orange-500 text-sm">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="email" name="email" required
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none focus:border-orange-500 text-sm">
+      </div>
+
+      <!-- Kata Sandi -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi</label>
+        <input type="password" id="password" name="password" required
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none focus:border-orange-500 text-sm">
+      </div>
+
+      <!-- Konfirmasi Kata Sandi -->
+      <div>
+        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Konfirmasi Kata Sandi</label>
+        <input type="password" id="password_confirmation" name="password_confirmation" required
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none focus:border-orange-500 text-sm">
+      </div>
+
+      <!-- Pilih Role -->
+      <div>
+        <label for="role" class="block text-sm font-medium text-gray-700">Pilih Role</label>
+        <select id="role" name="role" required
+          class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:outline-none focus:border-orange-500 text-sm bg-white">
+          <option value="" disabled selected>Pilih Role</option>
+          <option value="admin">Admin</option>
+          <option value="delivery">Delivery</option>
+        </select>
+      </div>
+
+      <!-- Error Message -->
+      @if ($errors->any())
+        <div class="bg-red-100 text-red-700 px-4 py-2 rounded-md text-sm">
+          <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
+      <!-- Submit -->
+      <div>
+        <button type="submit" class="btn-orange w-full py-2 rounded-lg text-sm font-semibold">Daftar</button>
+      </div>
+
+      <!-- Login Link -->
+      <div class="text-center">
+        <p class="text-sm text-gray-600">Sudah punya akun?
+          <a href="{{ route('login') }}" class="text-orange-500 hover:underline font-medium">Masuk di sini</a>
+        </p>
+      </div>
+    </form>
   </div>
 
 </body>
