@@ -6,8 +6,8 @@ use App\Models\Plant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle; // Required for styling
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;    // For SVG (no dependencies)
+use BaconQrCode\Renderer\RendererStyle\RendererStyle; 
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;    
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Writer;
 
@@ -76,6 +76,10 @@ class PlantController extends Controller
     {
         $plant = Plant::findOrFail($id);
         $plant->delete();
+
+        if (Storage::disk('public')->exists($plant->photo)) {
+            Storage::disk('public')->delete($plant->photo);
+        }
 
         return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant deleted successfully.');
     }
