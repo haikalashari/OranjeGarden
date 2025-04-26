@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Plant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle; // Required for styling
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;    // For SVG (no dependencies)
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Writer;
 
 class PlantController extends Controller
 {
@@ -24,15 +29,32 @@ class PlantController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        Plant::create($validatedData);
+        if (!Storage::disk('public')->exists('plants')) {
+            Storage::disk('public')->makeDirectory('plants');
+        }
+        
+        if (!Storage::disk('public')->exists('qrcodes')) {
+            Storage::disk('public')->makeDirectory('qrcodes');
+        }
+
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('plants', 'public');
+            $validatedData['photo'] = $photoPath;
+        }
+
+        $plant = Plant::create($validatedData);
+
+        $rendererStyle = new RendererStyle(300); // Size in pixels
+        $imageBackEnd = new SvgImageBackEnd();
+        $renderer = new ImageRenderer($rendererStyle, $imageBackEnd);
+        $writer = new Writer($renderer);
+        $qrImage = $writer->writeString($plant->id);
+        $qrCodePath = 'qrcodes/' . $plant->id . '.svg';
+
+        Storage::disk('public')->put($qrCodePath, $qrImage);
+        $plant->update(['qr_code' => $qrCodePath]);
 
         return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant added successfully.');
-    }
-
-    public function detailPlant($id)
-    {
-        $plant = Plant::findOrFail($id);
-        return view('dashboard.kelola.plant-detail', compact('plant'));
     }
 
     public function editPlant(Request $request, $id)
