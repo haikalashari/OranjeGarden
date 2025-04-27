@@ -47,10 +47,7 @@
                         </td>
                         <td class="px-6 py-4">{{ $plant->stock }}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($plant->price, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
-                        <a href="#" onclick="openQRModal('{{ $plant->id }}', '{{ $plant->name }}', '{{ asset('storage/' . $plant->qr_code) }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none text-center">
-                                QR
-                            </a>                        
+                        <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                
                             <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }})" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.plant.hapus', $plant->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus tanaman ini?');">
                                 @csrf
@@ -135,25 +132,20 @@
     </div>
 </div>
 
-<div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
+<!-- <div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Plant QR Code</h2>
 
-        <!-- QR Code Display -->
         <div id="qr-code-inner" class="flex justify-center mb-6">
-            <!-- QR will be injected here dynamically -->
         </div>
 
-        <!-- Plant Info -->
         <div class="mb-6 space-y-2">
             <p class="text-sm"><span class="font-medium">Plant ID:</span> <span id="qr-plant-id"></span></p>
             <p class="text-sm"><span class="font-medium">Name:</span> <span id="qr-plant-name"></span></p>
         </div>
 
-        <!-- Action Buttons -->
         <div class="flex justify-between">
             <button onclick="printQRCode()" class="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center gap-2">
-                <!-- Print Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
@@ -161,7 +153,6 @@
             </button>
             
             <button onclick="downloadQRCode()" class="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-2">
-                <!-- Download Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
@@ -173,7 +164,7 @@
             </button>
         </div>
     </div>
-</div>
+</div> -->
 
 
 
@@ -242,62 +233,62 @@
         }
     });
 
-    function openQRModal(plantId, plantName, qrCodeUrl) {
-        document.getElementById('qrCodeModal').classList.remove('hidden');
+    // function openQRModal(plantId, plantName, qrCodeUrl) {
+    //     document.getElementById('qrCodeModal').classList.remove('hidden');
 
-        // Update the plant info
-        document.getElementById('qr-plant-id').textContent = plantId;
-        document.getElementById('qr-plant-name').textContent = plantName;
+    //     // Update the plant info
+    //     document.getElementById('qr-plant-id').textContent = plantId;
+    //     document.getElementById('qr-plant-name').textContent = plantName;
 
-        // Fetch the QR Code file dynamically
-        fetch(qrCodeUrl)
-            .then(response => response.text())
-            .then(svg => {
-                document.getElementById('qr-code-inner').innerHTML = svg;
-            });
-    }
+    //     // Fetch the QR Code file dynamically
+    //     fetch(qrCodeUrl)
+    //         .then(response => response.text())
+    //         .then(svg => {
+    //             document.getElementById('qr-code-inner').innerHTML = svg;
+    //         });
+    // }
 
-    function closeQRModal() {
-        document.getElementById('qrCodeModal').classList.add('hidden');
-    }
+    // function closeQRModal() {
+    //     document.getElementById('qrCodeModal').classList.add('hidden');
+    // }
 
-    function printQRCode() {
-        const printWindow = window.open('', '_blank');
-        const qrContent = document.getElementById('qr-code-inner').innerHTML;
-        const plantName = document.getElementById('qr-plant-name').textContent;
-        const plantId = document.getElementById('qr-plant-id').textContent;
+    // function printQRCode() {
+    //     const printWindow = window.open('', '_blank');
+    //     const qrContent = document.getElementById('qr-code-inner').innerHTML;
+    //     const plantName = document.getElementById('qr-plant-name').textContent;
+    //     const plantId = document.getElementById('qr-plant-id').textContent;
 
-        printWindow.document.write(`
-            <html>
-                <head><title>Print QR Code</title></head>
-                <body style="text-align: center; padding-top: 50px;">
-                    ${qrContent}
-                    <h2>${plantName} (ID: ${plantId})</h2>
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-    }
+    //     printWindow.document.write(`
+    //         <html>
+    //             <head><title>Print QR Code</title></head>
+    //             <body style="text-align: center; padding-top: 50px;">
+    //                 ${qrContent}
+    //                 <h2>${plantName} (ID: ${plantId})</h2>
+    //             </body>
+    //         </html>
+    //     `);
+    //     printWindow.document.close();
+    //     printWindow.print();
+    // }
 
-    function downloadQRCode() {
-        const svgElement = document.getElementById('qr-code-inner').querySelector('svg');
-        if (!svgElement) {
-            alert('QR code not found!');
-            return;
-        }
+    // function downloadQRCode() {
+    //     const svgElement = document.getElementById('qr-code-inner').querySelector('svg');
+    //     if (!svgElement) {
+    //         alert('QR code not found!');
+    //         return;
+    //     }
 
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(svgBlob);
+    //     const svgData = new XMLSerializer().serializeToString(svgElement);
+    //     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    //     const url = URL.createObjectURL(svgBlob);
 
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'plant-qr-code.svg';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
+    //     const link = document.createElement('a');
+    //     link.href = url;
+    //     link.download = 'plant-qr-code.svg';
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    //     URL.revokeObjectURL(url);
+    // }
 </script>
 @endsection

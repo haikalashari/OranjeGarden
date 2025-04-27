@@ -37,10 +37,10 @@ class PlantController extends Controller
         //     Storage::disk('public')->makeDirectory('qrcodes');
         // }
 
-        // if ($request->hasFile('photo')) {
-        //     $photoPath = $request->file('photo')->store('plants', 'public');
-        //     $validatedData['photo'] = $photoPath;
-        // }
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('plants', 'public');
+            $validatedData['photo'] = $photoPath;
+        }
 
         $plant = Plant::create($validatedData);
 
@@ -67,6 +67,13 @@ class PlantController extends Controller
             'stock' => 'required|integer',
             'price' => 'required|numeric',
         ]);
+        if ($request->hasFile('photo')) {
+            if ($plant->photo && Storage::disk('public')->exists($plant->photo)) {
+                Storage::disk('public')->delete($plant->photo);
+            }
+            $photoPath = $request->file('photo')->store('plants', 'public');
+            $validatedData['photo'] = $photoPath;
+        }
 
         $plant->update($validatedData);
         return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant updated successfully.');
