@@ -29,13 +29,13 @@ class PlantController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        if (!Storage::disk('public')->exists('plants')) {
-            Storage::disk('public')->makeDirectory('plants');
-        }
+        // if (!Storage::disk('public')->exists('plants')) {
+        //     Storage::disk('public')->makeDirectory('plants');
+        // }
         
-        if (!Storage::disk('public')->exists('qrcodes')) {
-            Storage::disk('public')->makeDirectory('qrcodes');
-        }
+        // if (!Storage::disk('public')->exists('qrcodes')) {
+        //     Storage::disk('public')->makeDirectory('qrcodes');
+        // }
 
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('plants', 'public');
@@ -44,15 +44,15 @@ class PlantController extends Controller
 
         $plant = Plant::create($validatedData);
 
-        $rendererStyle = new RendererStyle(300); // Size in pixels
-        $imageBackEnd = new SvgImageBackEnd();
-        $renderer = new ImageRenderer($rendererStyle, $imageBackEnd);
-        $writer = new Writer($renderer);
-        $qrImage = $writer->writeString($plant->id);
-        $qrCodePath = 'qrcodes/' . $plant->id . '.svg';
+        // $rendererStyle = new RendererStyle(300); // Size in pixels
+        // $imageBackEnd = new SvgImageBackEnd();
+        // $renderer = new ImageRenderer($rendererStyle, $imageBackEnd);
+        // $writer = new Writer($renderer);
+        // $qrImage = $writer->writeString($plant->id);
+        // $qrCodePath = 'qrcodes/' . $plant->id . '.svg';
 
-        Storage::disk('public')->put($qrCodePath, $qrImage);
-        $plant->update(['qr_code' => $qrCodePath]);
+        // Storage::disk('public')->put($qrCodePath, $qrImage);
+        // $plant->update(['qr_code' => $qrCodePath]);
 
         return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant added successfully.');
     }
@@ -67,6 +67,13 @@ class PlantController extends Controller
             'stock' => 'required|integer',
             'price' => 'required|numeric',
         ]);
+        if ($request->hasFile('photo')) {
+            if ($plant->photo && Storage::disk('public')->exists($plant->photo)) {
+                Storage::disk('public')->delete($plant->photo);
+            }
+            $photoPath = $request->file('photo')->store('plants', 'public');
+            $validatedData['photo'] = $photoPath;
+        }
 
         $plant->update($validatedData);
         return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant updated successfully.');
@@ -77,9 +84,9 @@ class PlantController extends Controller
         $plant = Plant::findOrFail($id);
         $plant->delete();
 
-        if (Storage::disk('public')->exists($plant->photo)) {
-            Storage::disk('public')->delete($plant->photo);
-        }
+        // if (Storage::disk('public')->exists($plant->photo)) {
+        //     Storage::disk('public')->delete($plant->photo);
+        // }
 
         return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant deleted successfully.');
     }

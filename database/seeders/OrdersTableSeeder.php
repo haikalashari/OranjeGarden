@@ -33,7 +33,6 @@ class OrdersTableSeeder extends Seeder
             'total_price' => 450000.00,
             'payment_status' => 'paid',
             'payment_proof' => 'payment_proofs/sample.jpg',
-            'delivery_status' => 'pending',
             'assigned_deliverer_id' => $deliverer->id,
         ]);
 

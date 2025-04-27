@@ -7,7 +7,7 @@
 @section('content')
 <div class="p-6">
     <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold text-orange-600">Plants Management</h1>
+        <h1 class="text-2xl font-bold text-orange-600">Halaman Tanaman</h1>
     </div>
 
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 gap-3">
@@ -23,7 +23,7 @@
             <input type="text" id="table-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for products">
         </div>
 
-        <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Add Plant</button>
+        <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Tambah Tanaman</button>
     </div>
 
     <div class="relative overflow-hidden rounded-lg shadow-md">
@@ -47,15 +47,12 @@
                         </td>
                         <td class="px-6 py-4">{{ $plant->stock }}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($plant->price, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
-                        <a href="#" onclick="openQRModal('{{ $plant->id }}', '{{ $plant->name }}', '{{ asset('storage/' . $plant->qr_code) }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none text-center">
-                                QR
-                            </a>                        
+                        <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                
                             <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }})" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.plant.hapus', $plant->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus tanaman ini?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-300 focus:outline-none text-center">Delete</button>
+                                <button type="submit" class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-300 focus:outline-none text-center">Hapus</button>
                             </form>
                         </td>
                     </tr>
@@ -63,7 +60,7 @@
 
                     @if ($plants->isEmpty())
                     <tr>
-                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">No plants found.</td>
+                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada Tanaman Saat ini.</td>
                     </tr>
                     @endif
                 </tbody>
@@ -76,15 +73,15 @@
 <!-- Add Plant Modal -->
 <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Add New Plant</h2>
+        <h2 class="text-2xl font-bold text-orange-600 mb-4">Tambah Tanaman</h2>
         <form id="addForm" action="{{ route('dashboard.kelola.plant.tambah') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Plant Name</label>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama Tanaman</label>
                 <input type="text" name="name" id="name" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="photo" class="block text-sm font-medium text-gray-700">Photo</label>
+                <label for="photo" class="block text-sm font-medium text-gray-700">Foto</label>
                 <input type="file" name="photo" id="photo" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
@@ -92,12 +89,12 @@
                 <input type="number" name="stock" id="stock" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                <label for="price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="price" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="flex justify-end">
-                <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Add</button>
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
             </div>
         </form>
     </div>
@@ -106,16 +103,16 @@
 <!-- Edit Plant Modal -->
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Edit Plant</h2>
+        <h2 class="text-2xl font-bold text-orange-600 mb-4">Edit Tanaman</h2>
         <form id="editForm" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-4">
-                <label for="edit-name" class="block text-sm font-medium text-gray-700">Plant Name</label>
+                <label for="edit-name" class="block text-sm font-medium text-gray-700">Nama Tanaman</label>
                 <input type="text" name="name" id="edit-name" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="edit-photo" class="block text-sm font-medium text-gray-700">Photo</label>
+                <label for="edit-photo" class="block text-sm font-medium text-gray-700">Foto</label>
                 <input type="file" name="photo" id="edit-photo" class="block w-full mt-1 p-2 border rounded-lg">
                 <img id="edit-photo-preview" src="" class="h-12 w-12 object-cover rounded-lg shadow-sm mt-2 hidden">
             </div>
@@ -124,36 +121,31 @@
                 <input type="number" name="stock" id="edit-stock" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="edit-price" class="block text-sm font-medium text-gray-700">Price</label>
+                <label for="edit-price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="edit-price" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="flex justify-end">
-                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Save</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
             </div>
         </form>
     </div>
 </div>
 
-<div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
+<!-- <div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Plant QR Code</h2>
 
-        <!-- QR Code Display -->
         <div id="qr-code-inner" class="flex justify-center mb-6">
-            <!-- QR will be injected here dynamically -->
         </div>
 
-        <!-- Plant Info -->
         <div class="mb-6 space-y-2">
             <p class="text-sm"><span class="font-medium">Plant ID:</span> <span id="qr-plant-id"></span></p>
             <p class="text-sm"><span class="font-medium">Name:</span> <span id="qr-plant-name"></span></p>
         </div>
 
-        <!-- Action Buttons -->
         <div class="flex justify-between">
             <button onclick="printQRCode()" class="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center gap-2">
-                <!-- Print Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
@@ -161,7 +153,6 @@
             </button>
             
             <button onclick="downloadQRCode()" class="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-2">
-                <!-- Download Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
@@ -173,7 +164,7 @@
             </button>
         </div>
     </div>
-</div>
+</div> -->
 
 
 
@@ -242,62 +233,62 @@
         }
     });
 
-    function openQRModal(plantId, plantName, qrCodeUrl) {
-        document.getElementById('qrCodeModal').classList.remove('hidden');
+    // function openQRModal(plantId, plantName, qrCodeUrl) {
+    //     document.getElementById('qrCodeModal').classList.remove('hidden');
 
-        // Update the plant info
-        document.getElementById('qr-plant-id').textContent = plantId;
-        document.getElementById('qr-plant-name').textContent = plantName;
+    //     // Update the plant info
+    //     document.getElementById('qr-plant-id').textContent = plantId;
+    //     document.getElementById('qr-plant-name').textContent = plantName;
 
-        // Fetch the QR Code file dynamically
-        fetch(qrCodeUrl)
-            .then(response => response.text())
-            .then(svg => {
-                document.getElementById('qr-code-inner').innerHTML = svg;
-            });
-    }
+    //     // Fetch the QR Code file dynamically
+    //     fetch(qrCodeUrl)
+    //         .then(response => response.text())
+    //         .then(svg => {
+    //             document.getElementById('qr-code-inner').innerHTML = svg;
+    //         });
+    // }
 
-    function closeQRModal() {
-        document.getElementById('qrCodeModal').classList.add('hidden');
-    }
+    // function closeQRModal() {
+    //     document.getElementById('qrCodeModal').classList.add('hidden');
+    // }
 
-    function printQRCode() {
-        const printWindow = window.open('', '_blank');
-        const qrContent = document.getElementById('qr-code-inner').innerHTML;
-        const plantName = document.getElementById('qr-plant-name').textContent;
-        const plantId = document.getElementById('qr-plant-id').textContent;
+    // function printQRCode() {
+    //     const printWindow = window.open('', '_blank');
+    //     const qrContent = document.getElementById('qr-code-inner').innerHTML;
+    //     const plantName = document.getElementById('qr-plant-name').textContent;
+    //     const plantId = document.getElementById('qr-plant-id').textContent;
 
-        printWindow.document.write(`
-            <html>
-                <head><title>Print QR Code</title></head>
-                <body style="text-align: center; padding-top: 50px;">
-                    ${qrContent}
-                    <h2>${plantName} (ID: ${plantId})</h2>
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-    }
+    //     printWindow.document.write(`
+    //         <html>
+    //             <head><title>Print QR Code</title></head>
+    //             <body style="text-align: center; padding-top: 50px;">
+    //                 ${qrContent}
+    //                 <h2>${plantName} (ID: ${plantId})</h2>
+    //             </body>
+    //         </html>
+    //     `);
+    //     printWindow.document.close();
+    //     printWindow.print();
+    // }
 
-    function downloadQRCode() {
-        const svgElement = document.getElementById('qr-code-inner').querySelector('svg');
-        if (!svgElement) {
-            alert('QR code not found!');
-            return;
-        }
+    // function downloadQRCode() {
+    //     const svgElement = document.getElementById('qr-code-inner').querySelector('svg');
+    //     if (!svgElement) {
+    //         alert('QR code not found!');
+    //         return;
+    //     }
 
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(svgBlob);
+    //     const svgData = new XMLSerializer().serializeToString(svgElement);
+    //     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    //     const url = URL.createObjectURL(svgBlob);
 
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'plant-qr-code.svg';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
+    //     const link = document.createElement('a');
+    //     link.href = url;
+    //     link.download = 'plant-qr-code.svg';
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    //     URL.revokeObjectURL(url);
+    // }
 </script>
 @endsection

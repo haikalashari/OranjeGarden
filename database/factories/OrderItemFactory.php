@@ -29,9 +29,6 @@ class OrderItemFactory extends Factory
         return [
             'order_id' => $order->id, // Use existing order ID
             'plant_id' => Plant::inRandomOrder()->first()->id,
-            'scanned_by' => $this->faker->optional()->randomElement(
-                User::where('role', 'delivery')->pluck('id')->toArray()
-            ),
             'quantity' => $this->faker->numberBetween(1, 10),
         ];
     }

@@ -20,7 +20,6 @@ class PlantsTableSeeder extends Seeder
             'photo' => 'plants/sansevieria.jpg',
             'stock' => 10,
             'price' => 150000,
-            'qr_code' => Str::uuid(),
         ]);
 
         // Create multiple random plants using factory
