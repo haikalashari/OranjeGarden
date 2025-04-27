@@ -18,23 +18,6 @@ class Customer extends Model
         'name',
         'contact_no',
         'email',
-        'total_orders',
-        'total_spent',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'total_spent' => 'decimal:2',
-    ];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false; // Since you're manually handling created_at
 }

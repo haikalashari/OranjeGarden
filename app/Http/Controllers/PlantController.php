@@ -29,6 +29,24 @@ class PlantController extends Controller
             'price' => 'required|numeric',
         ]);
 
+        DB::beginTransaction();
+
+        try{
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('plants', 'public');
+                $validatedData['photo'] = $photoPath;
+            }
+    
+            $plant = Plant::create($validatedData);
+
+            DB::commit();
+
+            return redirect()->route('dashboard.kelola.plant')->with('success', 'Tanaman Berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('dashboard.kelola.plant')->with('error', 'Gagal Menambahkan Tanaman' . $e->getMessage());
+        }
+
         // if (!Storage::disk('public')->exists('plants')) {
         //     Storage::disk('public')->makeDirectory('plants');
         // }
@@ -37,12 +55,6 @@ class PlantController extends Controller
         //     Storage::disk('public')->makeDirectory('qrcodes');
         // }
 
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('plants', 'public');
-            $validatedData['photo'] = $photoPath;
-        }
-
-        $plant = Plant::create($validatedData);
 
         // $rendererStyle = new RendererStyle(300); // Size in pixels
         // $imageBackEnd = new SvgImageBackEnd();
@@ -54,7 +66,6 @@ class PlantController extends Controller
         // Storage::disk('public')->put($qrCodePath, $qrImage);
         // $plant->update(['qr_code' => $qrCodePath]);
 
-        return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant added successfully.');
     }
 
     public function editPlant(Request $request, $id)
@@ -67,27 +78,52 @@ class PlantController extends Controller
             'stock' => 'required|integer',
             'price' => 'required|numeric',
         ]);
-        if ($request->hasFile('photo')) {
-            if ($plant->photo && Storage::disk('public')->exists($plant->photo)) {
-                Storage::disk('public')->delete($plant->photo);
-            }
-            $photoPath = $request->file('photo')->store('plants', 'public');
-            $validatedData['photo'] = $photoPath;
-        }
 
-        $plant->update($validatedData);
-        return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant updated successfully.');
+        DB::beginTransaction();
+
+        try {
+            if ($request->hasFile('photo')) {
+                if ($plant->photo && Storage::disk('public')->exists($plant->photo)) {
+                    Storage::disk('public')->delete($plant->photo);
+                }
+                $photoPath = $request->file('photo')->store('plants', 'public');
+                $validatedData['photo'] = $photoPath;
+            }
+
+            $plant->update($validatedData);
+
+            DB::commit();
+
+            return redirect()->route('dashboard.kelola.plant')->with('success', 'Tanaman Berhasil Diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Tanaman Gagal Diperbarui: ' . $e->getMessage());
+        }
     }
 
     public function hapusPlant($id)
     {
         $plant = Plant::findOrFail($id);
-        $plant->delete();
-
         // if (Storage::disk('public')->exists($plant->photo)) {
         //     Storage::disk('public')->delete($plant->photo);
         // }
+        DB::beginTransaction();
 
-        return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant deleted successfully.');
+        try {
+            if ($plant->photo && Storage::disk('public')->exists($plant->photo)) {
+                Storage::disk('public')->delete($plant->photo);
+            }
+
+            $plant->delete();
+
+            DB::commit();
+
+            return redirect()->route('dashboard.kelola.plant')->with('success', 'Plant deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Failed to delete plant: ' . $e->getMessage());
+        }
     }
 }

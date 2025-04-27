@@ -16,9 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('contact_no');
             $table->string('email')->unique();
-            $table->integer('total_orders')->default(0);
-            $table->decimal('total_spent', 12, 2)->default(0);
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
         
     }

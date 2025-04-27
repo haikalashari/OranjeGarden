@@ -12,6 +12,18 @@
     @include('layouts.partials.sidebar')    <!-- Sidebar -->
 
     <main class="p-4 sm:ml-64 mt-16">
+        @if (session('error'))
+            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+                {{ session('success') }}
+            </div>
+        @endif
+        
         @yield('content')           <!-- Konten halaman -->
     </main>
     

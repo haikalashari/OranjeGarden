@@ -45,8 +45,8 @@
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $customer->name }}</td>
                         <td class="px-6 py-4">{{ $customer->contact_no }}</td>
                         <td class="px-6 py-4">{{ $customer->email }}</td>
-                        <td class="px-6 py-4">{{ $customer->total_orders }}</td>
-                        <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($customer->total_spent, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4">total orders</td>
+                        <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp total spent disini</td>
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                    
                             <a href="#" onclick="openEditModal({{ $customer->id }}, '{{ $customer->name }}', '{{ $customer->contact_no }}', '{{ $customer->email }}', '{{ $customer->total_orders }}', '{{ $customer->total_spent }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.customer.hapus', $customer->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus data customer ini?');">
@@ -88,14 +88,6 @@
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                 <input type="email" name="email" id="email" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
-            <div class="mb-4">
-                <label for="total_orders" class="block text-sm font-medium text-gray-700">Total Order</label>
-                <input type="number" name="total_orders" id="total_orders" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
-            <div class="mb-4">
-                <label for="total_spent" class="block text-sm font-medium text-gray-700">Total Pengeluaran Uang</label>
-                <input type="number" name="total_spent" id="total_spent" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
             <div class="flex justify-end">
                 <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
                 <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Tambah</button>
@@ -122,14 +114,6 @@
             <div class="mb-4">
                 <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
                 <input type="email" name="email" id="edit-email" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
-            <div class="mb-4">
-                <label for="edit-total_orders" class="block text-sm font-medium text-gray-700">Total Order</label>
-                <input type="number" name="total_orders" id="edit-total_orders" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
-            <div class="mb-4">
-                <label for="edit-total_spent" class="block text-sm font-medium text-gray-700">Total Pengeluaran Uang</label>
-                <input type="number" name="total_spent" id="edit-total_spent" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="flex justify-end">
                 <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
@@ -162,15 +146,12 @@
         const editName = document.getElementById('edit-name');
         const editContactNo = document.getElementById('edit-contact_no');
         const editEmail = document.getElementById('edit-email');
-        const editTotalOrders = document.getElementById('edit-total_orders');
-        const editTotalSpent = document.getElementById('edit-total_spent');
+
 
         // Set form values
         editName.value = name;
         editContactNo.value = contact_no;
         editEmail.value = email;
-        editTotalOrders.value = total_orders;
-        editTotalSpent.value = total_spent;
 
         // Set the form action with the correct URL and ID
         editForm.action = `/dashboard/customers/${id}`;

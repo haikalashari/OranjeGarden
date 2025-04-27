@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class CustomerController extends Controller
 {
@@ -19,13 +22,23 @@ class CustomerController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            'contact_no' => 'required|string|max:15',
             'email' => 'required|email|unique:customers,email',
-            'phone' => 'required|string|max:15',
         ]);
 
-        Customer::create($validatedData);
+        DB::beginTransaction();
 
-        return redirect()->route('dashboard.kelola.customer')->with('success', 'Customer added successfully.');
+        try {
+            Customer::create($validatedData);
+
+            DB::commit();
+
+            return redirect()->route('dashboard.kelola.customer')->with('success', 'Customer Berhasil Ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Gagal Menambahkan Customer: ' . $e->getMessage());
+        }
     }
 
     public function editCustomer(Request $request, $id)
@@ -34,19 +47,43 @@ class CustomerController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,' . $customer->id,
-            'phone' => 'required|string|max:15',
+            'contact_no' => 'required|string|max:15',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('customers', 'email')->ignore($customer->id),
+            ],
         ]);
 
-        $customer->update($validatedData);
-        return redirect()->route('dashboard.kelola.customer')->with('success', 'Customer updated successfully.');
+        DB::beginTransaction();
+
+        try {
+            $customer->update($validatedData);
+
+            DB::commit();
+
+            return redirect()->route('dashboard.kelola.customer')->with('success', 'Customer Berhasil Diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal Memperbarui Customer: ' . $e->getMessage());
+        }
     }
 
     public function hapusCustomer($id)
     {
         $customer = Customer::findOrFail($id);
-        $customer->delete();
+        DB::beginTransaction();
 
-        return redirect()->route('dashboard.kelola.customer')->with('success', 'Customer deleted successfully.');
+        try {
+            $customer->delete();
+
+            DB::commit();
+
+            return redirect()->route('dashboard.kelola.customer')->with('success', 'Customer Berhasil Dihapus.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Gagal Menghapus Customer: ' . $e->getMessage());
+        }
     }
 }

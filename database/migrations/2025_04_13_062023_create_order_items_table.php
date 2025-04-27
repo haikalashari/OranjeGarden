@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('plant_id')->constrained('plants')->onDelete('cascade');
-            $table->foreignId('scanned_by')->nullable()->constrained('users')->onDelete('set null');
             $table->integer('quantity');
             $table->timestamp('created_at')->useCurrent();
         });
