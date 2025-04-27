@@ -16,7 +16,6 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'plant_id',
-        'scanned_by',
         'quantity',
     ];
 
@@ -44,10 +43,5 @@ class OrderItem extends Model
     public function plant()
     {
         return $this->belongsTo(Plant::class);
-    }
-
-    public function scanner()
-    {
-        return $this->belongsTo(User::class, 'scanned_by');
     }
 }

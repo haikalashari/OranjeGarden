@@ -21,7 +21,6 @@ class Order extends Model
         'total_price',
         'payment_status',
         'payment_proof',
-        'delivery_status',
         'delivery_photo',
         'assigned_deliverer_id'
     ];

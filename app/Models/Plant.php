@@ -19,7 +19,6 @@ class Plant extends Model
         'photo',
         'stock',
         'price',
-        'qr_code',
     ];
 
     /**
@@ -34,12 +33,4 @@ class Plant extends Model
     /**
      * Boot the model.
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($plant) {
-            $plant->qr_code = $plant->qr_code ?: Str::uuid();
-        });
-    }
 }

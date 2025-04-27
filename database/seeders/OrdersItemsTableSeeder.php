@@ -23,7 +23,6 @@ class OrdersItemsTableSeeder extends Seeder
     {
         $order = Order::first();
         $plant = Plant::first();
-        $scanner = User::where('role', 'delivery')->first();
 
         if (!$order || !$plant) {
             $this->command->info('No orders or plants found! Please seed those first.');
@@ -33,7 +32,6 @@ class OrdersItemsTableSeeder extends Seeder
         OrderItem::create([
             'order_id' => $order->id,
             'plant_id' => $plant->id,
-            'scanned_by' => $scanner ? $scanner->id : null,
             'quantity' => 3,
         ]);
 

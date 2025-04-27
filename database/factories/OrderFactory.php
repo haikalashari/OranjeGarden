@@ -26,7 +26,6 @@ class OrderFactory extends Factory
             'total_price' => $this->faker->randomFloat(2, 100000, 1000000),
             'payment_status' => $this->faker->randomElement(['paid', 'unpaid']),
             'payment_proof' => $this->faker->optional()->imageUrl(),
-            'delivery_status' => $this->faker->randomElement(['pending', 'delivering', 'delivered']),
             'delivery_photo' => $this->faker->optional()->imageUrl(),
             'assigned_deliverer_id' => User::where('role', 'delivery')->inRandomOrder()->first()->id,
         ];
