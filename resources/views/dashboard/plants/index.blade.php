@@ -7,7 +7,7 @@
 @section('content')
 <div class="p-6">
     <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold text-orange-600">Plants Management</h1>
+        <h1 class="text-2xl font-bold text-orange-600">Halaman Tanaman</h1>
     </div>
 
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 gap-3">
@@ -23,7 +23,7 @@
             <input type="text" id="table-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for products">
         </div>
 
-        <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Add Plant</button>
+        <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Tambah Tanaman</button>
     </div>
 
     <div class="relative overflow-hidden rounded-lg shadow-md">
@@ -52,7 +52,7 @@
                             <form action="{{ route('dashboard.kelola.plant.hapus', $plant->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus tanaman ini?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-300 focus:outline-none text-center">Delete</button>
+                                <button type="submit" class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-300 focus:outline-none text-center">Hapus</button>
                             </form>
                         </td>
                     </tr>
@@ -60,7 +60,7 @@
 
                     @if ($plants->isEmpty())
                     <tr>
-                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">No plants found.</td>
+                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada Tanaman Saat ini.</td>
                     </tr>
                     @endif
                 </tbody>
@@ -73,15 +73,15 @@
 <!-- Add Plant Modal -->
 <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Add New Plant</h2>
+        <h2 class="text-2xl font-bold text-orange-600 mb-4">Tambah Tanaman</h2>
         <form id="addForm" action="{{ route('dashboard.kelola.plant.tambah') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-700">Plant Name</label>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama Tanaman</label>
                 <input type="text" name="name" id="name" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="photo" class="block text-sm font-medium text-gray-700">Photo</label>
+                <label for="photo" class="block text-sm font-medium text-gray-700">Foto</label>
                 <input type="file" name="photo" id="photo" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
@@ -89,12 +89,12 @@
                 <input type="number" name="stock" id="stock" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                <label for="price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="price" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="flex justify-end">
-                <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Add</button>
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
             </div>
         </form>
     </div>
@@ -103,16 +103,16 @@
 <!-- Edit Plant Modal -->
 <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Edit Plant</h2>
+        <h2 class="text-2xl font-bold text-orange-600 mb-4">Edit Tanaman</h2>
         <form id="editForm" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-4">
-                <label for="edit-name" class="block text-sm font-medium text-gray-700">Plant Name</label>
+                <label for="edit-name" class="block text-sm font-medium text-gray-700">Nama Tanaman</label>
                 <input type="text" name="name" id="edit-name" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="edit-photo" class="block text-sm font-medium text-gray-700">Photo</label>
+                <label for="edit-photo" class="block text-sm font-medium text-gray-700">Foto</label>
                 <input type="file" name="photo" id="edit-photo" class="block w-full mt-1 p-2 border rounded-lg">
                 <img id="edit-photo-preview" src="" class="h-12 w-12 object-cover rounded-lg shadow-sm mt-2 hidden">
             </div>
@@ -121,12 +121,12 @@
                 <input type="number" name="stock" id="edit-stock" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="edit-price" class="block text-sm font-medium text-gray-700">Price</label>
+                <label for="edit-price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="edit-price" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="flex justify-end">
-                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Save</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
             </div>
         </form>
     </div>
