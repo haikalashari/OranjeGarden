@@ -19,8 +19,6 @@ class CustomersTableSeeder extends Seeder
             'name' => 'John Doe',
             'contact_no' => '08123456789',
             'email' => 'johndoe@example.com',
-            'total_orders' => 0,
-            'total_spent' => 0,
         ]);
 
         // Create multiple random customers
@@ -31,7 +29,6 @@ class CustomersTableSeeder extends Seeder
         // Create customers with orders history
         Customer::factory()
             ->count(5)
-            ->withOrders()
             ->create();
     } 
 }

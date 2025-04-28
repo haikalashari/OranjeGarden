@@ -20,7 +20,6 @@ return new class extends Migration
             $table->decimal('total_price', 12, 2);
             $table->enum('payment_status', ['paid', 'unpaid'])->default('unpaid');
             $table->string('payment_proof')->nullable();
-            $table->enum('delivery_status', ['pending', 'delivering', 'delivered'])->default('pending');
             $table->string('delivery_photo')->nullable();
             $table->foreignId('assigned_deliverer_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();

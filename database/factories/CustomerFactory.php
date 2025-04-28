@@ -20,19 +20,6 @@ class CustomerFactory extends Factory
             'name' => $this->faker->name,
             'contact_no' => '08' . $this->faker->numerify('########'),
             'email' => $this->faker->unique()->safeEmail,
-            'total_orders' => 0,
-            'total_spent' => 0,
         ];
-    }
-
-    // Optional state methods for specific scenarios
-    public function withOrders()
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'total_orders' => $this->faker->numberBetween(1, 10),
-                'total_spent' => $this->faker->numberBetween(100000, 1000000),
-            ];
-        });
     }
 }
