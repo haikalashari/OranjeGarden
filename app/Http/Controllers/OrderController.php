@@ -37,7 +37,7 @@ class OrderController extends Controller
             'new_customer_email' => 'nullable|email|max:255',
             'rental_duration' => 'required|integer|min:1',
             'delivery_address' => 'required|string',
-            'payment_status' => 'required|in:paid,unpaid', // << lowercase!
+            'payment_status' => 'required|in:paid,unpaid', 
             'assigned_deliverer_id' => 'nullable|exists:users,id',
             'plants' => 'required|array|min:1',
             'plants.*.plant_id' => 'required|exists:plants,id',
@@ -76,7 +76,6 @@ class OrderController extends Controller
                 'assigned_deliverer_id' => $validatedData['assigned_deliverer_id'],
             ]);
     
-            // Insert order items
             foreach ($validatedData['plants'] as $plantData) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -97,23 +96,26 @@ class OrderController extends Controller
 
     public function editOrder(Request $request, $id)
     {
-        $order = Order::findOrFail($id);
-
-        $validatedData = $request->validate([
-            'plant_id' => 'required|exists:plants,id',
-            'customer_id' => 'required|exists:customers,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $order->update($validatedData);
-        return redirect()->route('dashboard.kelola.order')->with('success', 'Order updated successfully.');
+    
     }
 
     public function hapusOrder($id)
     {
         $order = Order::findOrFail($id);
-        $order->delete();
 
-        return redirect()->route('dashboard.kelola.order')->with('success', 'Order deleted successfully.');
+        DB::beginTransaction();
+        try {
+            $order->delete();
+
+            $orderItems = OrderItem::where('order_id', $id)->get();
+            foreach ($orderItems as $item) {
+                $item->delete();
+            }
+    
+            return redirect()->route('dashboard.kelola.order')->with('success', 'Order Berhasil Dihapus.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menghapus order: ' . $e->getMessage());
+        }
     }
 }

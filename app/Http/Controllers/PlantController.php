@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plant;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle; 
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;    
-use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Writer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use BaconQrCode\Renderer\ImageRenderer;
+use Illuminate\Support\Facades\Storage;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;    
+use BaconQrCode\Renderer\RendererStyle\RendererStyle; 
 
 class PlantController extends Controller
 {

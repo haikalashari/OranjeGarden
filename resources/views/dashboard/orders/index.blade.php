@@ -51,9 +51,29 @@
                         <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->order_date)->translatedFormat('d F Y') }}</td>                        <td class="px-6 py-4">{{ $item->rental_duration }} Hari</td>
                         <td class="px-6 py-4">{{ $item->delivery_address}}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4">{{ $item->payment_status}}</td>
+                        @if($item->payment_status == 'paid')
+                        <td class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800">
+                        Sudah Dibayar
+                        </td>
+                        @else
+                        <td class="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-800">
+                        Belum Dibayar
+                        </td>
+                        @endif
                         <td class="px-6 py-4">status order disini</td>
                         <td class="px-6 py-4">{{ $item->deliverer->name }}</td>
+                        <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
+                            <form action="{{ route('dashboard.kelola.order.hapus', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus data order ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-300 focus:outline-none text-center">
+                                    Hapus
+                                </button>
+                            </form>
+                            <a href="#" class="inline-block px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none text-center">
+                                Detail
+                            </a>
+                        </td>
                     </tr>
                     @endforeach
 
@@ -165,36 +185,6 @@
 </div>
 
 
-<!-- <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Edit Tanaman</h2>
-        <form id="editForm" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <div class="mb-4">
-                <label for="edit-name" class="block text-sm font-medium text-gray-700">Nama Tanaman</label>
-                <input type="text" name="name" id="edit-name" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
-            <div class="mb-4">
-                <label for="edit-photo" class="block text-sm font-medium text-gray-700">Foto</label>
-                <input type="file" name="photo" id="edit-photo" class="block w-full mt-1 p-2 border rounded-lg">
-                <img id="edit-photo-preview" src="" class="h-12 w-12 object-cover rounded-lg shadow-sm mt-2 hidden">
-            </div>
-            <div class="mb-4">
-                <label for="edit-stock" class="block text-sm font-medium text-gray-700">Stock</label>
-                <input type="number" name="stock" id="edit-stock" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
-            <div class="mb-4">
-                <label for="edit-price" class="block text-sm font-medium text-gray-700">Harga</label>
-                <input type="number" name="price" id="edit-price" class="block w-full mt-1 p-2 border rounded-lg">
-            </div>
-            <div class="flex justify-end">
-                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
-            </div>
-        </form>
-    </div>
-</div> -->
 
 <!-- <div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
@@ -280,57 +270,6 @@
         plantsSection.appendChild(newPlantItem);
         plantIndex++;
     }
-
-    // Function to open the edit plant modal with pre-filled data
-    function openEditModal(id, name, photo, stock, price) {
-        const editModal = document.getElementById('editModal');
-        const editForm = document.getElementById('editForm');
-        const editName = document.getElementById('edit-name');
-        const editStock = document.getElementById('edit-stock');
-        const editPrice = document.getElementById('edit-price');
-        const editPhotoPreview = document.getElementById('edit-photo-preview');
-
-        // Set form values
-        editName.value = name;
-        editStock.value = stock;
-        editPrice.value = price;
-        
-        // Set the form action with the correct URL and ID
-        editForm.action = `/dashboard/plant/${id}`;
-
-        // Handle photo preview
-        if (photo) {
-            editPhotoPreview.src = `/storage/${photo}`;
-            editPhotoPreview.classList.remove('hidden');
-        } else {
-            editPhotoPreview.classList.add('hidden');
-        }
-
-        // Show modal
-        editModal.classList.remove('hidden');
-    }
-
-    // Function to close the edit plant modal
-    function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
-    }
-
-    // Handle photo preview when editing
-    document.getElementById('edit-photo').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        const preview = document.getElementById('edit-photo-preview');
-        
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.src = e.target.result;
-                preview.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.classList.add('hidden');
-        }
-    });
 
     // function openQRModal(plantId, plantName, qrCodeUrl) {
     //     document.getElementById('qrCodeModal').classList.remove('hidden');

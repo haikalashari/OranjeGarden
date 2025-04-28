@@ -14,7 +14,9 @@ class CustomerController extends Controller
     public function tampilkanDataCustomer()
     {
         $user = Auth::user();
-        $customers = Customer::all();
+        $customers = Customer::withCount('order')
+        ->withSum('order', 'total_price')
+        ->get();
         return view('dashboard.customers.index', compact('customers', 'user'));
     }
 
