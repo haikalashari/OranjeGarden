@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('status_category', function (Blueprint $table) {
             $table->id();
             $table->string('status');
+            $table->timestamps();
         });
     }
 

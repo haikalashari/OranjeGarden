@@ -6,17 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class StatusCategory extends Model
 {
-    /* The table associated with the model.
-    *
-    * @var string
-    */
-   protected $table = 'status_category';
-    /*
-   
-   * @var array
-   */
-  protected $fillable = [
-      'status',
-  ];
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $table = 'status_category';
+
+    protected $fillable = ['status'];
 }

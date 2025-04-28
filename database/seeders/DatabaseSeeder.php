@@ -10,6 +10,8 @@ use Database\Seeders\OrdersTableSeeder;
 use Database\Seeders\PlantsTableSeeder;
 use Database\Seeders\CustomersTableSeeder;
 use Database\Seeders\OrdersItemsTableSeeder;
+use Database\Seeders\OrderStatusTableSeeder;
+use Database\Seeders\StatusCategoryTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,6 +26,8 @@ class DatabaseSeeder extends Seeder
             PlantsTableSeeder::class,
             OrdersTableSeeder::class,   
             OrdersItemsTableSeeder::class,
+            StatusCategoryTableSeeder::class,
+            OrderStatusTableSeeder::class,
         ]);
     }
 }

@@ -6,20 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderStatus extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'order_status';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    public $timestamps = false;
+
     protected $fillable = [
         'order_id',
-        'status_id'
+        'status_id',
+        'created_at' 
     ];
 }
