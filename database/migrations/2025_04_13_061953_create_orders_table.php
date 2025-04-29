@@ -24,7 +24,6 @@ return new class extends Migration
             $table->foreignId('assigned_deliverer_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
-        
     }
 
     /**

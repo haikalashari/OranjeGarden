@@ -60,7 +60,7 @@
                         Belum Dibayar
                         </td>
                         @endif
-                        <td class="px-6 py-4">status order disini</td>
+                        <td class="px-6 py-4">{{ $item->latestStatus->status_category->status }}</td>
                         <td class="px-6 py-4">{{ $item->deliverer->name }}</td>
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
                             <form action="{{ route('dashboard.kelola.order.hapus', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus data order ini?');">
@@ -93,7 +93,7 @@
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Tambah Order</h2>
 
-        <form id="addOrderForm" action="{{ route('dashboard.kelola.order.tambah') }}" method="POST">
+        <form id="addOrderForm" action="{{ route('dashboard.kelola.order.tambah') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <!-- Customer Selection -->
@@ -155,13 +155,10 @@
                 </div>
             </div>
 
-            <!-- Payment Status -->
-            <div class="mb-4">
-                <label for="payment_status" class="block text-sm font-medium text-gray-700">Status Pembayaran</label>
-                <select name="payment_status" id="payment_status" class="block w-full mt-1 p-2 border rounded-lg" required>
-                    <option value="paid">Paid</option>
-                    <option value="unpaid">Unpaid</option>
-                </select>
+            <!-- Proof of Payment -->
+            <div id="proofPaymentField" class="mb-4">
+                <label for="payment_proof" class="block text-sm font-medium text-gray-700">Upload Bukti Pembayaran</label>
+                <input type="file" name="payment_proof" id="payment_proof" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
 
             <!-- Deliverer Selection -->
