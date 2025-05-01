@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Plant;
 use App\Models\Customer;
 use App\Models\OrderItem;
+use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ class OrderController extends Controller
     public function tampilkanDataOrder()
     {
         $user = Auth::user();
-        $order = Order::all();
+        $order = Order::with('LatestStatus')->get();
         $customers = Customer::all();
         $plants = Plant::all();
         $deliverers = User::where('role', 'delivery ')->get();
@@ -27,6 +28,7 @@ class OrderController extends Controller
 
     public function tambahOrder(Request $request)
     {
+
         $validatedData = $request->validate([
             'customer_id' => [
                 'required',
@@ -37,17 +39,15 @@ class OrderController extends Controller
             'new_customer_email' => 'nullable|email|max:255',
             'rental_duration' => 'required|integer|min:1',
             'delivery_address' => 'required|string',
-            'payment_status' => 'required|in:paid,unpaid', 
-            'assigned_deliverer_id' => 'nullable|exists:users,id',
+            'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'assigned_deliverer_id' => 'required|exists:users,id',
             'plants' => 'required|array|min:1',
             'plants.*.plant_id' => 'required|exists:plants,id',
             'plants.*.quantity' => 'required|integer|min:1',
         ]);
-
-        DB::beginTransaction();
-
+        
         try {
-
+            DB::beginTransaction();
             if ($validatedData['customer_id'] === 'new') {
                 $customer = Customer::create([
                     'name' => $validatedData['new_customer_name'],
@@ -58,21 +58,29 @@ class OrderController extends Controller
             } else {
                 $customerId = $validatedData['customer_id'];
             }
-    
+            
             $totalPrice = 0;
-    
+            
             foreach ($validatedData['plants'] as $plantData) {
                 $plant = Plant::findOrFail($plantData['plant_id']);
                 $totalPrice += $plant->price * $plantData['quantity'];
             }
-    
+            
+            $paymentStatus = 'unpaid';
+            if ($request->hasFile('payment_proof')) {
+                $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+                $validatedData['payment_proof'] = $paymentProofPath;
+                $paymentStatus = 'paid';
+            }
+
             $order = Order::create([
                 'customer_id' => $customerId,
                 'order_date' => Carbon::now(),
                 'rental_duration' => $validatedData['rental_duration'],
                 'delivery_address' => $validatedData['delivery_address'],
                 'total_price' => $totalPrice,
-                'payment_status' => $validatedData['payment_status'],
+                'payment_status' => $paymentStatus,
+                'payment_proof' => $validatedData['payment_proof'] ?? null,
                 'assigned_deliverer_id' => $validatedData['assigned_deliverer_id'],
             ]);
     
@@ -83,6 +91,20 @@ class OrderController extends Controller
                     'quantity' => $plantData['quantity'],
                 ]);
             }
+
+            $orderStatus = new OrderStatus();
+            $status_id = 0;
+            if ($paymentStatus == 'paid' && $validatedData['payment_proof'] !== null) {
+                $status_id = 2; 
+            } else {
+                $status_id = 1; 
+            }
+
+            $orderStatus = OrderStatus::create([
+                'order_id' => $order->id,
+                'status_id' => $status_id, 
+                'created_at' => Carbon::now(),
+            ]);
 
             DB::commit();
         return redirect()->route('dashboard.kelola.order')->with('success', 'Order berhasil ditambahkan.');
@@ -103,14 +125,23 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        DB::beginTransaction();
+        
         try {
-            $order->delete();
+            DB::beginTransaction();
 
             $orderItems = OrderItem::where('order_id', $id)->get();
             foreach ($orderItems as $item) {
                 $item->delete();
             }
+
+            $orderStatus = OrderStatus::where('order_id', $id)->get();
+            foreach ($orderStatus as $status) {
+                $status->delete();
+            }
+
+            $order->delete();
+
+            DB::commit();
     
             return redirect()->route('dashboard.kelola.order')->with('success', 'Order Berhasil Dihapus.');
         } catch (\Exception $e) {
