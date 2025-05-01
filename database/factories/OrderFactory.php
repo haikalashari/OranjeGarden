@@ -21,13 +21,10 @@ class OrderFactory extends Factory
         return [
             'customer_id' => Customer::factory(),
             'order_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
-            'rental_duration' => $this->faker->numberBetween(1, 30),
+            'end_date' => $this->faker->dateTimeBetween('now', '+1 month'),
             'delivery_address' => $this->faker->address,
-            'total_price' => $this->faker->randomFloat(2, 100000, 1000000),
             'payment_status' => $this->faker->randomElement(['paid', 'unpaid']),
             'payment_proof' => $this->faker->optional()->imageUrl(),
-            'delivery_photo' => $this->faker->optional()->imageUrl(),
-            'assigned_deliverer_id' => User::where('role', 'delivery')->inRandomOrder()->first()->id,
         ];
     }
 }

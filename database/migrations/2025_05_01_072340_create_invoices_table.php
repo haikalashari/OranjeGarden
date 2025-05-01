@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('plant_id')->constrained('plants')->onDelete('cascade');
-            $table->integer('quantity');
-            $table->integer('replacement_batch')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->integer('batch_number');
+            $table->string('invoice_pdf_path');
+            $table->timestamps();
         });
-        
     }
 
     /**
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('invoices');
     }
 };

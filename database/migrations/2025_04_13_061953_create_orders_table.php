@@ -15,13 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->date('order_date');
-            $table->integer('rental_duration');
+            $table->date('end_date');
             $table->text('delivery_address');
-            $table->decimal('total_price', 12, 2);
             $table->enum('payment_status', ['paid', 'unpaid'])->default('unpaid');
             $table->string('payment_proof')->nullable();
-            $table->string('delivery_photo')->nullable();
-            $table->foreignId('assigned_deliverer_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

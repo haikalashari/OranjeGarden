@@ -20,6 +20,7 @@ class PlantsTableSeeder extends Seeder
             'photo' => 'plants/sansevieria.jpg',
             'stock' => 10,
             'price' => 150000,
+            'category' => 'kecil',
         ]);
 
         // Create multiple random plants using factory

@@ -6,18 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /** 
+    /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('qr_code', function (Blueprint $table) {
+        Schema::create('order_deliverers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->string('qr_code_delivered')->nullable();
-            $table->string('qr_code_returned')->nullable();
-            $table->timestamp('qr_code_delivered_used_at')->nullable();
-            $table->timestamp('qr_code_returned_used_at')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->integer('batch_number');
+            $table->string('delivery_photo')->nullable();
+            $table->enum('status', ['Mengantar', 'Mengganti', 'Ambil Kembali'])->default('Mengantar');
+            $table->timestamps();
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('qr_code');
+        Schema::dropIfExists('order_deliverers');
     }
 };

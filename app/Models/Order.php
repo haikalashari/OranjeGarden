@@ -16,13 +16,10 @@ class Order extends Model
     protected $fillable = [
         'customer_id',
         'order_date',
-        'rental_duration',
+        'end_date',
         'delivery_address',
-        'total_price',
         'payment_status',
         'payment_proof',
-        'delivery_photo',
-        'assigned_deliverer_id'
     ];
 
     protected $casts = [

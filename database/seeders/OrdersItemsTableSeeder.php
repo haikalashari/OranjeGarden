@@ -33,6 +33,7 @@ class OrdersItemsTableSeeder extends Seeder
             'order_id' => $order->id,
             'plant_id' => $plant->id,
             'quantity' => 3,
+            'replacement_batch' => 0,
         ]);
 
         // Add more sample items if needed

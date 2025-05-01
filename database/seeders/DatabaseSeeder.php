@@ -8,10 +8,12 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\UsersTableSeeder;
 use Database\Seeders\OrdersTableSeeder;
 use Database\Seeders\PlantsTableSeeder;
+use Database\Seeders\InvoicesTableSeeder;
 use Database\Seeders\CustomersTableSeeder;
 use Database\Seeders\OrdersItemsTableSeeder;
 use Database\Seeders\OrderStatusTableSeeder;
 use Database\Seeders\StatusCategoryTableSeeder;
+use Database\Seeders\OrderDeliverersTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -28,6 +30,8 @@ class DatabaseSeeder extends Seeder
             OrdersItemsTableSeeder::class,
             StatusCategoryTableSeeder::class,
             OrderStatusTableSeeder::class,
+            OrderDeliverersTableSeeder::class,
+            InvoicesTableSeeder::class,
         ]);
     }
 }

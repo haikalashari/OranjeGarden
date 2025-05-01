@@ -15,10 +15,10 @@ class StatusCategoryTableSeeder extends Seeder
     public function run(): void
     {
         $statuses = [
-            'Menunggu Pembayaran',
             'Proses Pengantaran',
             'Sudah Diantar',
             'Dalam Masa Sewa',
+            'Proses Penggantian Tanaman',
             'Proses Pengambilan Kembali',
             'Order Selesai',
             'Order Dibatalkan',

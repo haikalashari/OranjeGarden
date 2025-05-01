@@ -19,6 +19,7 @@ class Plant extends Model
         'photo',
         'stock',
         'price',
+        'category',
     ];
 
     /**
