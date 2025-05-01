@@ -35,6 +35,7 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Photo</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Stock</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Harga</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Kategori</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Action</th>
                     </tr>
                 </thead>
@@ -47,6 +48,11 @@
                         </td>
                         <td class="px-6 py-4">{{ $plant->stock }}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($plant->price, 0, ',', '.') }}</td>
+                        @if ($plant->category == 'kecil')
+                        <td class="px-6 py-4">Kecil</td>
+                        @else
+                        <td class="px-6 py-4">Besar</td>
+                        @endif
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                
                             <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }})" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.plant.hapus', $plant->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus tanaman ini?');">
@@ -92,6 +98,13 @@
                 <label for="price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="price" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
+            <div class="mb-4">
+                <label for="category" class="block text-sm font-medium text-gray-700">Kategori</label>
+                <select name="category" id="category" class="block w-full mt-1 p-2 border rounded-lg">
+                    <option value="kecil">Kecil</option>
+                    <option value="besar">Besar</option>
+                </select>
+            </div>
             <div class="flex justify-end">
                 <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
                 <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
@@ -123,6 +136,13 @@
             <div class="mb-4">
                 <label for="edit-price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="edit-price" class="block w-full mt-1 p-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label for="category" class="block text-sm font-medium text-gray-700">Kategori</label>
+                <select name="category" id="category" class="block w-full mt-1 p-2 border rounded-lg">
+                    <option value="kecil">Kecil</option>
+                    <option value="besar">Besar</option>
+                </select>
             </div>
             <div class="flex justify-end">
                 <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
@@ -189,6 +209,7 @@
         const editName = document.getElementById('edit-name');
         const editStock = document.getElementById('edit-stock');
         const editPrice = document.getElementById('edit-price');
+        const editCategory = document.getElementById('category');
         const editPhotoPreview = document.getElementById('edit-photo-preview');
 
         // Set form values

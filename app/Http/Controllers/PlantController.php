@@ -28,6 +28,7 @@ class PlantController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer',
             'price' => 'required|numeric',
+            'category' => 'required|string|in:kecil,besar',
         ]);
 
         DB::beginTransaction();
@@ -78,6 +79,7 @@ class PlantController extends Controller
             'photo' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer',
             'price' => 'required|numeric',
+            'category' => 'required|string|in:kecil,besar',
         ]);
 
         DB::beginTransaction();
