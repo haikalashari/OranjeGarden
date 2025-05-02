@@ -52,4 +52,9 @@ class Order extends Model
     {
         return $this->hasOne(OrderStatus::class, 'order_id')->latest();
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoices::class);
+    }
 }

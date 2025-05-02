@@ -14,4 +14,9 @@ class Invoices extends Model
         'batch_number',
         'invoice_pdf_path',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }
