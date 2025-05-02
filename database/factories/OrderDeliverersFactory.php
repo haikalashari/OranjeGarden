@@ -13,7 +13,7 @@ class OrderDelivererFactory extends Factory
         return [
             'order_id' => Order::inRandomOrder()->first()->id ?? Order::factory(),
             'user_id' => User::where('deliverer')->inRandomOrder()->first()->id ?? User::factory(),
-            'batch_number' => $this->faker->numberBetween(1, 5),
+            'delivery_batch' => $this->faker->numberBetween(0, 1),
             'delivery_photo' => $this->faker->imageUrl(640, 480, 'plants', true),
             'status' => $this->faker->randomElement(['Mengantar', 'Mengganti', 'Ambil Kembali']),
         ];

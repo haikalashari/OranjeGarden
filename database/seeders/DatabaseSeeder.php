@@ -10,6 +10,7 @@ use Database\Seeders\OrdersTableSeeder;
 use Database\Seeders\PlantsTableSeeder;
 use Database\Seeders\InvoicesTableSeeder;
 use Database\Seeders\CustomersTableSeeder;
+use Database\Seeders\OrderTotalPriceSeeder;
 use Database\Seeders\OrdersItemsTableSeeder;
 use Database\Seeders\OrderStatusTableSeeder;
 use Database\Seeders\StatusCategoryTableSeeder;
@@ -32,6 +33,7 @@ class DatabaseSeeder extends Seeder
             OrderStatusTableSeeder::class,
             OrderDeliverersTableSeeder::class,
             InvoicesTableSeeder::class,
+            OrderTotalPriceSeeder::class,
         ]);
     }
 }

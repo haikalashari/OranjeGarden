@@ -29,7 +29,7 @@ class OrderDeliverersTableSeeder extends Seeder
             OrderDeliverers::create([
                 'order_id' => $order->id,
                 'user_id' => $deliverer->id,
-                'batch_number' => 1,
+                'delivery_batch' => 0,
                 'delivery_photo' => 'deliveries/' . uniqid() . '.jpg',
                 'status' => 'Mengantar',
             ]);

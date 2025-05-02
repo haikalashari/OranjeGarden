@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('batch_number');
+            $table->integer('delivery_batch')->default(0);
             $table->string('delivery_photo')->nullable();
             $table->enum('status', ['Mengantar', 'Mengganti', 'Ambil Kembali'])->default('Mengantar');
             $table->timestamps();

@@ -15,12 +15,12 @@ class InvoicesTableSeeder extends Seeder
     public function run(): void
     {
          Order::all()->each(function ($order) {
-            $batchCount = rand(1, 3); 
+            $batchCount = 0; 
 
             for ($i = 1; $i <= $batchCount; $i++) {
                 Invoices::create([
                     'order_id' => $order->id,
-                    'batch_number' => $i,
+                    'invoice_batch' => $i,
                     'invoice_pdf_path' => 'invoices/' . uniqid() . '.pdf',
                 ]);
             }
