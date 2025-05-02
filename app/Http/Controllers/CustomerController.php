@@ -14,10 +14,18 @@ class CustomerController extends Controller
     public function tampilkanDataCustomer()
     {
         $user = Auth::user();
-
-        $customers = Customer::withCount('orders')
-            ->with('orders.invoices')
-            ->get();
+        $customers = Customer::with('orders.invoices')
+        ->select('customers.*')
+        ->addSelect([
+            'total_spent' => function ($query) {
+                $query->select(DB::raw('COALESCE(SUM(order_total_prices.total_price), 0)'))
+                    ->from('orders')
+                    ->join('order_total_prices', 'orders.id', '=', 'order_total_prices.order_id')
+                    ->whereColumn('orders.customer_id', 'customers.id');
+            }
+        ])
+        ->withCount('orders')
+        ->get();
         return view('dashboard.customers.index', compact('customers', 'user'));
     }
 

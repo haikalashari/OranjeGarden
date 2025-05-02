@@ -57,4 +57,9 @@ class Order extends Model
     {
         return $this->hasMany(Invoices::class);
     }
+
+    public function totalPrices()
+    {
+        return $this->hasMany(OrderTotalPrice::class);
+    }
 }
