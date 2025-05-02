@@ -8,14 +8,13 @@ use App\Models\OrderTotalPrice;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class OrderTotalPriceSeeder extends Seeder
+class OrderTotalPricesTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Ambil semua order
         $orders = Order::all();
 
         foreach ($orders as $order) {
@@ -36,3 +35,5 @@ class OrderTotalPriceSeeder extends Seeder
         }
     }
 }
+
+

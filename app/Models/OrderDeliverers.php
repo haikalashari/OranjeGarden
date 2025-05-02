@@ -12,7 +12,7 @@ class OrderDeliverers extends Model
     protected $fillable = [
         'order_id',
         'user_id',
-        'batch_number',
+        'delivery_batch',
         'delivery_photo',
         'status',
     ];

@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Order;
-use App\Models\Invoices;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\OrderTotalPrice;
+use App\Models\Invoices;
 
 class InvoicesTableSeeder extends Seeder
 {
@@ -14,16 +13,19 @@ class InvoicesTableSeeder extends Seeder
      */
     public function run(): void
     {
-         Order::all()->each(function ($order) {
-            $batchCount = 0; 
+        $billingRecords = OrderTotalPrice::all();
 
-            for ($i = 1; $i <= $batchCount; $i++) {
-                Invoices::create([
-                    'order_id' => $order->id,
-                    'invoice_batch' => $i,
-                    'invoice_pdf_path' => 'invoices/' . uniqid() . '.pdf',
-                ]);
-            }
-        });
+        if ($billingRecords->isEmpty()) {
+            $this->command->info('No order_total_price records found. Please seed that first.');
+            return;
+        }
+
+        foreach ($billingRecords as $billing) {
+            Invoices::create([
+                'order_id' => $billing->order_id,
+                'invoice_batch' => $billing->billing_batch,
+                'invoice_pdf_path' => 'invoices/' . uniqid() . '.pdf',
+            ]);
+        }
     }
 }

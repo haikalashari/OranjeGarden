@@ -11,7 +11,7 @@ class Invoices extends Model
 
     protected $fillable = [
         'order_id',
-        'batch_number',
+        'invoice_batch',
         'invoice_pdf_path',
     ];
 

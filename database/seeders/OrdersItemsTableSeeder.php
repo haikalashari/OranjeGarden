@@ -21,23 +21,38 @@ class OrdersItemsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $order = Order::first();
-        $plant = Plant::first();
+        $orders = Order::all();
+        $plants = Plant::all();
 
-        if (!$order || !$plant) {
+        if ($orders->isEmpty() || $plants->isEmpty()) {
             $this->command->info('No orders or plants found! Please seed those first.');
             return;
         }
 
-        OrderItem::create([
-            'order_id' => $order->id,
-            'plant_id' => $plant->id,
-            'quantity' => 3,
-            'replacement_batch' => 0,
-        ]);
+        foreach ($orders as $order) {
+            // Tambahkan batch awal (replacement_batch = 0)
+            foreach ($plants->random(2) as $plant) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'plant_id' => $plant->id,
+                    'quantity' => rand(1, 3),
+                    'replacement_batch' => 0,
+                ]);
+            }
 
-        // Add more sample items if needed
-        OrderItem::factory()->count(10)->create();
+            // Tambahkan 1 atau 2 pergantian batch (replacement_batch = 1, 2, dst.)
+            $batchCount = rand(1, 2);
+            for ($batch = 1; $batch <= $batchCount; $batch++) {
+                foreach ($plants->random(2) as $plant) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'plant_id' => $plant->id,
+                        'quantity' => rand(1, 3),
+                        'replacement_batch' => $batch,
+                    ]);
+                }
+            }
+        }
     }
     
 }
