@@ -34,7 +34,8 @@ class CustomerController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'contact_no' => 'required|string|max:15',
-            'email' => 'required|email|unique:customers,email',
+            'secondary_contact_no' => 'nullable|string|max:15',
+            'email' => 'nullable|email|unique:customers,email',
         ]);
 
         DB::beginTransaction();
@@ -59,6 +60,7 @@ class CustomerController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'contact_no' => 'required|string|max:15',
+            'secondary_contact_no' => 'nullable|string|max:15',
             'email' => [
                 'required',
                 'email',
