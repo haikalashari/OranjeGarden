@@ -54,7 +54,7 @@
                         <td class="px-6 py-4">Besar</td>
                         @endif
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                
-                            <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }})" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
+                            <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }}, '{{ $plant->category }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.plant.hapus', $plant->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus tanaman ini?');">
                                 @csrf
                                 @method('DELETE')
@@ -138,8 +138,8 @@
                 <input type="number" name="price" id="edit-price" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
-                <label for="category" class="block text-sm font-medium text-gray-700">Kategori</label>
-                <select name="category" id="category" class="block w-full mt-1 p-2 border rounded-lg">
+                <label for="edit-category" class="block text-sm font-medium text-gray-700">Kategori</label>
+                <select name="category" id="edit-category" class="block w-full mt-1 p-2 border rounded-lg">
                     <option value="kecil">Kecil</option>
                     <option value="besar">Besar</option>
                 </select>
@@ -203,19 +203,20 @@
     }
 
     // Function to open the edit plant modal with pre-filled data
-    function openEditModal(id, name, photo, stock, price) {
+    function openEditModal(id, name, photo, stock, price, category) {
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
         const editName = document.getElementById('edit-name');
         const editStock = document.getElementById('edit-stock');
         const editPrice = document.getElementById('edit-price');
-        const editCategory = document.getElementById('category');
+        const editCategory = document.getElementById('edit-category');
         const editPhotoPreview = document.getElementById('edit-photo-preview');
 
         // Set form values
         editName.value = name;
         editStock.value = stock;
         editPrice.value = price;
+        editCategory.value = category;
         
         // Set the form action with the correct URL and ID
         editForm.action = `/dashboard/plant/${id}`;
