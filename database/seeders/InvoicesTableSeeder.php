@@ -24,6 +24,7 @@ class InvoicesTableSeeder extends Seeder
             Invoices::create([
                 'order_id' => $billing->order_id,
                 'invoice_batch' => $billing->billing_batch,
+                'invoice_number' => 'INV-' . str_pad($billing->order_id, 6, '0', STR_PAD_LEFT),
                 'invoice_pdf_path' => 'invoices/' . uniqid() . '.pdf',
             ]);
         }

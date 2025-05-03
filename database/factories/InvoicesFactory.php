@@ -20,6 +20,7 @@ class InvoicesFactory extends Factory
         return [
             'order_id' => Order::inRandomOrder()->first()->id ?? Order::factory(),
             'invoice_batch' => $this->faker->numberBetween(0, 1),
+            'invoice_number' => 'INV-' . str_pad($this->faker->unique()->numberBetween(1, 999999), 6, '0', STR_PAD_LEFT),
             'invoice_pdf_path' => 'invoices/' . $this->faker->uuid . '.pdf',
         ];
     }
