@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('delivery_address');
             $table->enum('payment_status', ['paid', 'unpaid'])->default('unpaid');
             $table->string('payment_proof')->nullable();
+            $table->decimal('total_price', 10, 2);
             $table->timestamps();
         });
     }

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->string('invoice_number')->unique();
-            $table->integer('invoice_batch')->default(0);
             $table->string('invoice_pdf_path');
             $table->timestamps();
         });

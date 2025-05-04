@@ -32,6 +32,7 @@ class OrdersTableSeeder extends Seeder
             'delivery_address' => '123 Main St, Anytown, AN 12345',
             'payment_status' => 'paid',
             'payment_proof' => 'payment_proofs/sample.jpg',
+            'total_price' => 150.00,
         ]);
 
         // Add more sample orders if needed

@@ -21,10 +21,12 @@ class Order extends Model
         'delivery_address',
         'payment_status',
         'payment_proof',
+        'total_price',
     ];
 
     protected $casts = [
         'order_date' => 'date',
+        'end_date' => 'date',
         'total_price' => 'decimal:2',
     ];
 
@@ -58,12 +60,6 @@ class Order extends Model
     {
         return $this->hasMany(Invoices::class);
     }
-
-    public function totalPrices()
-    {
-        return $this->hasMany(OrderTotalPrice::class);
-    }
-
 
     protected $appends = ['rental_duration'];
 

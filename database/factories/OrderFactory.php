@@ -25,6 +25,7 @@ class OrderFactory extends Factory
             'delivery_address' => $this->faker->address,
             'payment_status' => $this->faker->randomElement(['paid', 'unpaid']),
             'payment_proof' => $this->faker->optional()->imageUrl(),
+            'total_price' => $this->faker->randomFloat(2, 10, 1000),
         ];
     }
 }
