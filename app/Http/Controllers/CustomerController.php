@@ -25,7 +25,7 @@ class CustomerController extends Controller
             }
         ])
         ->withCount('orders')
-        ->get();
+        ->paginate(15);
         return view('dashboard.customers.index', compact('customers', 'user'));
     }
 

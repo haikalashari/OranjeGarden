@@ -73,6 +73,9 @@
             </table>
         </div>
     </div>
+    <div class="mt-4">
+        {{ $plants->links() }}
+    </div>
 </div>
 
 

@@ -86,6 +86,9 @@
             </table>
         </div>
     </div>
+    <div class="mt-4">
+        {{ $order->links() }}
+    </div>
 </div>
 
 

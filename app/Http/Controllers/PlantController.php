@@ -17,7 +17,7 @@ class PlantController extends Controller
     public function tampilkanDataPlant()
     {
         $user = Auth::user();
-        $plants = Plant::all();
+        $plants = Plant::paginate(15);
         return view('dashboard.plants.index', compact('plants', 'user'));
     }
 
