@@ -19,7 +19,7 @@ class OrderController extends Controller
     public function tampilkanDataOrder()
     {
         $user = Auth::user();
-        $order = Order::with('LatestStatus')->get();
+        $order = Order::with('LatestStatus')->paginate(10);
         $customers = Customer::all();
         $plants = Plant::all();
         $deliverers = User::where('role', 'delivery ')->get();

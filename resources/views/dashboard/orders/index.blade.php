@@ -39,7 +39,6 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Total Harga Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Pembayaran</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Order</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Pengantar</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Action</th>
                     </tr>
                 </thead>
@@ -61,7 +60,6 @@
                         </td>
                         @endif
                         <td class="px-6 py-4">{{ $item->latestStatus->status_category->status }}</td>
-                        <td class="px-6 py-4">{{ $item->deliverer->name }}</td>
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
                             <form action="{{ route('dashboard.kelola.order.hapus', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus data order ini?');">
                                 @csrf

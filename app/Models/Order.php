@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\OrderItem;
+use App\Models\OrderDeliverers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -35,7 +36,7 @@ class Order extends Model
 
     public function deliverer()
     {
-        return $this->belongsTo(User::class, 'assigned_deliverer_id');
+        return $this->belongsTo(OrderDeliverers::class);
     }
 
     public function orderItems()
@@ -61,5 +62,14 @@ class Order extends Model
     public function totalPrices()
     {
         return $this->hasMany(OrderTotalPrice::class);
+    }
+
+
+    protected $appends = ['rental_duration'];
+
+    public function getRentalDurationAttribute()
+    {
+        return \Carbon\Carbon::parse($this->order_date)
+            ->diffInDays(\Carbon\Carbon::parse($this->end_date));
     }
 }
