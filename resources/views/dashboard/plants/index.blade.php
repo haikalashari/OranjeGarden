@@ -44,7 +44,7 @@
                     <tr class="border-b last:rounded-b-lg last:border-none hover:bg-orange-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $plant->name }}</td>
                         <td class="px-6 py-4">
-                            <img src="{{ asset('storage/' . $plant->photo) }}" alt="{{ $plant->name }}" class="h-20 w-20 object-cover rounded-lg shadow-sm">
+                            <img src="{{ asset('storage/' . $plant->photo) }}" alt="{{ $plant->name }}" class="h-24 w-24 object-cover rounded-lg shadow-sm">
                         </td>
                         <td class="px-6 py-4">{{ $plant->stock }}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($plant->price, 0, ',', '.') }}</td>

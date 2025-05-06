@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
+use App\Models\OrderDeliverers;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -36,8 +37,10 @@ class OrderController extends Controller
             ],
             'new_customer_name' => 'nullable|string|max:255',
             'new_customer_contact' => 'nullable|string|max:20',
+            'new_secondary_customer_contact' => 'nullable|string|max:20',
             'new_customer_email' => 'nullable|email|max:255',
-            'rental_duration' => 'required|integer|min:1',
+            'order_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:order_date',
             'delivery_address' => 'required|string',
             'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'assigned_deliverer_id' => 'required|exists:users,id',
@@ -52,6 +55,7 @@ class OrderController extends Controller
                 $customer = Customer::create([
                     'name' => $validatedData['new_customer_name'],
                     'contact_no' => $validatedData['new_customer_contact'],
+                    'secondary_contact_no' => $validatedData['new_secondary_customer_contact'],
                     'email' => $validatedData['new_customer_email'],
                 ]);
                 $customerId = $customer->id;
@@ -76,30 +80,34 @@ class OrderController extends Controller
             $order = Order::create([
                 'customer_id' => $customerId,
                 'order_date' => Carbon::now(),
-                'rental_duration' => $validatedData['rental_duration'],
+                'end_date' => $validatedData['end_date'],
                 'delivery_address' => $validatedData['delivery_address'],
-                'total_price' => $totalPrice,
                 'payment_status' => $paymentStatus,
                 'payment_proof' => $validatedData['payment_proof'] ?? null,
-                'assigned_deliverer_id' => $validatedData['assigned_deliverer_id'],
+                'total_price' => $totalPrice,
             ]);
+
+            if($validatedData['assigned_deliverer_id']) {
+                OrderDeliverers::create([
+                    'order_id' => $order->id,
+                    'user_id' => $validatedData['assigned_deliverer_id'],
+                    'delivery_batch' => 0,
+                    'delivery_photo' => null,
+                    'status' => 'Mengantar',
+                ]);
+            }
     
             foreach ($validatedData['plants'] as $plantData) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'plant_id' => $plantData['plant_id'],
                     'quantity' => $plantData['quantity'],
+                    'replacement_batch' => 0,
                 ]);
             }
 
             $orderStatus = new OrderStatus();
-            $status_id = 0;
-            if ($paymentStatus == 'paid' && $validatedData['payment_proof'] !== null) {
-                $status_id = 2; 
-            } else {
-                $status_id = 1; 
-            }
-
+            $status_id = 1; 
             $orderStatus = OrderStatus::create([
                 'order_id' => $order->id,
                 'status_id' => $status_id, 
@@ -112,7 +120,32 @@ class OrderController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', 'Gagal menambahkan order: ' . $e->getMessage());
         }
-    
+    }
+
+    public function tampilkanDetailOrder($id)
+    {
+        $user = Auth::user();
+
+        // Ambil data order beserta relasi yang diperlukan
+        $order = Order::with([
+            'customer', // Relasi ke customer
+            'orderItems', // Relasi ke item order
+            'orderItems.plant', // Relasi ke item order dan tanaman
+            'status.status_category', // Relasi ke status order dan kategori status
+            'deliverer', // Relasi ke pengantar
+            'deliverer.user', // Relasi ke user pengantar
+        ])->findOrFail($id);
+
+        // Ambil riwayat status order
+        $orderStatuses = $order->status()->with('status_category')->get();
+
+        // Ambil riwayat pengiriman
+        $deliveries = $order->deliverer()->get();
+
+        // Ambil data invoice jika ada
+        $invoices = $order->invoices()->get();
+
+        return view('dashboard.orders.detail', compact('user', 'order', 'orderStatuses', 'deliveries', 'invoices'));
     }
     
 
@@ -137,6 +170,11 @@ class OrderController extends Controller
             $orderStatus = OrderStatus::where('order_id', $id)->get();
             foreach ($orderStatus as $status) {
                 $status->delete();
+            }
+
+            $orderDeliverers = OrderDeliverers::where('order_id', $id)->get();
+            foreach ($orderDeliverers as $deliverer) {
+                $deliverer->delete();
             }
 
             $order->delete();

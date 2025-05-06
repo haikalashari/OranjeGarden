@@ -38,7 +38,7 @@ class Order extends Model
 
     public function deliverer()
     {
-        return $this->belongsTo(OrderDeliverers::class);
+        return $this->hasMany(OrderDeliverers::class);
     }
 
     public function orderItems()
@@ -62,10 +62,10 @@ class Order extends Model
     }
 
     protected $appends = ['rental_duration'];
-
+    
     public function getRentalDurationAttribute()
     {
         return \Carbon\Carbon::parse($this->order_date)
-            ->diffInDays(\Carbon\Carbon::parse($this->end_date));
+            ->diffInDays(\Carbon\Carbon::parse($this->end_date)->subDay()) + 1;
     }
 }

@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(OrderController::class)->group(function () {
         Route::get('/dashboard/orders', 'tampilkanDataOrder')->name('dashboard.kelola.order');
         Route::post('/dashboard/orders', 'tambahOrder')->name('dashboard.kelola.order.tambah');
+        Route::get('/dashboard/orders/{id}', 'tampilkanDetailOrder')->name('dashboard.kelola.order.detail');
         Route::put('/dashboard/orders/{id}', 'editOrder')->name('dashboard.kelola.order.edit');
         Route::delete('/dashboard/orders/hapus/{id}', 'hapusOrder')->name('dashboard.kelola.order.hapus');
     });
@@ -55,6 +56,8 @@ Route::middleware('auth')->group(function () {
     Route::controller(DeliveryController::class)->group(function () {
         Route::get('/dashboard/deliveries', 'tampilkanDataDelivery')->name('dashboard.kelola.delivery');
         Route::post('/dashboard/deliveries', 'tambahDelivery')->name('dashboard.kelola.delivery.tambah');
+        Route::get('/dashboard/deliveries/{id}', 'tampilkanDetailDelivery')->name('dashboard.kelola.delivery.detail');
+        Route::post('/dashboard/deliveries/{id}/konfirmasi', 'konfirmasiDelivery')->name('dashboard.kelola.delivery.konfirmasi');
         Route::put('/dashboard/deliveries/{id}', 'editDelivery')->name('dashboard.kelola.delivery.edit');
         Route::delete('/dashboard/deliveries/hapus/{id}', 'hapusDelivery')->name('dashboard.kelola.delivery.hapus');
     });
