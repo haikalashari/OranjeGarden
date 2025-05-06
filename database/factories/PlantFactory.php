@@ -35,7 +35,7 @@ class PlantFactory extends Factory
                 'photo' => 'plants/' . Str::slug($this->faker->word) . '.jpg',
                 'stock' => $this->faker->numberBetween(0, 50),
                 'price' => $this->faker->numberBetween(50000, 500000),
-                'category' => $this->faker->randomElement(['kecil', 'besar']),
+                'category' => $this->faker->randomElement(['kecil', 'besar', 'sedang']),
             ];
     }
 }

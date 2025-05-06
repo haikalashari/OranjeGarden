@@ -25,9 +25,18 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('dashboard.index');
+            $request->session()->regenerate(); // regenerate session untuk keamanan
+            $user = Auth::user();
+    
+            if ($user->role === 'admin') {
+                return redirect()->route('dashboard.index');
+            } elseif ($user->role === 'delivery') {
+                return redirect()->route('dashboard.kelola.delivery');
+            } else {
+                Auth::logout();
+                return redirect()->route('login')->withErrors(['email' => 'Role tidak dikenali.']);
+            }
         }
 
         return back()->withErrors(['Email atau Password Salah']);

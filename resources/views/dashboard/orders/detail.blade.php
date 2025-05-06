@@ -125,7 +125,6 @@
                             <div class="flex-1 text-sm text-gray-700 dark:text-gray-300">
                                 <p class="font-medium">Batch {{ $delivery->delivery_batch }} - {{ $delivery->status }}</p>
                                 <p class="text-xs">Oleh: {{ $delivery->user->name ?? '-' }}</p>
-                                <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($delivery->created_at)->translatedFormat('d F Y H:i') }}</p>
                             </div>
                             @if ($delivery->delivery_photo)
                                 <img src="{{ asset('storage/' . $delivery->delivery_photo) }}" class="h-16 w-16 object-cover rounded-md border">

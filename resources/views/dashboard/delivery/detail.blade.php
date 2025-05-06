@@ -109,15 +109,14 @@
 
     </div>
 
-
     <!-- Upload Bukti Pengiriman -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h2 class="text-xl font-bold text-orange-600 mb-4">Upload Bukti Pengiriman</h2>
         <form action="{{ route('dashboard.kelola.delivery.konfirmasi', $order->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4">
-                <label for="delivery_photos" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Unggah Foto Bukti Pengiriman</label>
-                <input type="file" name="delivery_photos[]" id="delivery_photos" multiple class="block w-full mt-1 p-2 border rounded-lg">
+                <label for="delivery_photo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Unggah Foto Bukti Pengiriman</label>
+                <input type="file" name="delivery_photo" id="delivery_photo" multiple class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div id="preview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"></div>
             <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Konfirmasi Pengiriman</button>

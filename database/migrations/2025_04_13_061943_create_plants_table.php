@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('photo');
             $table->integer('stock')->default(0);
             $table->decimal('price', 10, 2);
-            $table->enum('category', ['kecil', 'besar'])->default('kecil')->nullable();
+            $table->enum('category', ['kecil', 'besar', 'sedang'])->default('kecil')->nullable();
             $table->timestamps();
         });
         

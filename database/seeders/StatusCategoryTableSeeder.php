@@ -16,7 +16,6 @@ class StatusCategoryTableSeeder extends Seeder
     {
         $statuses = [
             'Proses Pengantaran',
-            'Sudah Diantar',
             'Dalam Masa Sewa',
             'Proses Penggantian Tanaman',
             'Proses Pengambilan Kembali',

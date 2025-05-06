@@ -50,8 +50,10 @@
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($plant->price, 0, ',', '.') }}</td>
                         @if ($plant->category == 'kecil')
                         <td class="px-6 py-4">Kecil</td>
-                        @else
+                        @elseif ($plant->category == 'besar')
                         <td class="px-6 py-4">Besar</td>
+                        @else
+                        <td class="px-6 py-4">Sedang</td>
                         @endif
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                
                             <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }}, '{{ $plant->category }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
