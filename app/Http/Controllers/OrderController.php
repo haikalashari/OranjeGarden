@@ -285,9 +285,12 @@ class OrderController extends Controller
 
         $orderDeliverers = OrderDeliverers::where('order_id', $id)->get();
         foreach ($orderDeliverers as $deliverer) {
-            $deliverer->delete();
+            $deliverer->update([
+                'delivery_photo' => 'Admin Konfirm',
+            ]);
         }
 
+        DB::commit();
         return redirect()->route('dashboard.kelola.order')->with('success', 'Order berhasil dibatalkan.');
         } catch (\Exception $e) {
             DB::rollback();
