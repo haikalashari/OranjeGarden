@@ -36,7 +36,7 @@ class DeliveryController extends Controller
             })->whereHas('deliverer', function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                       ->whereNull('delivery_photo');
-            })->with(['customer', 'latestStatus.status_category', 'deliverer'])->paginate(10);
+            })->with(['customer', 'latestStatus.status_category', 'deliverer'])->get();
         }
         return view('dashboard.delivery.index', compact('orders', 'user'));
     }
@@ -72,12 +72,12 @@ class DeliveryController extends Controller
         try {
             DB::beginTransaction();
     
-            // Ambil deliverer aktif
-            $deliverer = $order->deliverer()
+            // ambil data order_deliverer
+            $deliverer = OrderDeliverers::where('order_id', $id)
                 ->where('user_id', $user->id)
-                ->whereNull('delivery_photo')
-                ->firstOrFail();
-    
+                ->latest('created_at')
+                ->first();
+
             // Simpan foto
             $photoPath = $request->file('delivery_photo')->store('delivery_photos', 'public');
             $deliverer->delivery_photo = $photoPath;
@@ -95,7 +95,7 @@ class DeliveryController extends Controller
             } elseif ($status === 'Proses Pengambilan Kembali') {
                 OrderStatus::create([
                     'order_id' => $order->id,
-                    'status_id' => 4, // Order Selesai
+                    'status_id' => 5, // Order Selesai
                 ]);
             }
     

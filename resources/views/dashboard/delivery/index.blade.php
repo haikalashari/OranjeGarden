@@ -45,14 +45,7 @@
                     <div>
                         <p class="text-sm text-gray-500 uppercase">Proses</p>
                         <p class="text-base font-semibold text-orange-600">
-                            {{ $order->process_type ?? 'Pengantaran' }}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p class="text-sm text-gray-500 uppercase">Status Terakhir</p>
-                        <p class="text-base text-gray-700 dark:text-gray-300">
-                            {{ $order->status->last()->status_category->status ?? 'Belum ada status' }}
+                            {{ $order->latestStatus->status_category->status }}
                         </p>
                     </div>
 

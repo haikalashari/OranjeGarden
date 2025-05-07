@@ -42,8 +42,13 @@ Route::middleware('auth', 'role:admin')->group(function () {
         Route::get('/dashboard/orders', 'tampilkanDataOrder')->name('dashboard.kelola.order');
         Route::post('/dashboard/orders', 'tambahOrder')->name('dashboard.kelola.order.tambah');
         Route::get('/dashboard/orders/{id}', 'tampilkanDetailOrder')->name('dashboard.kelola.order.detail');
-        Route::put('/dashboard/orders/{id}', 'editOrder')->name('dashboard.kelola.order.edit');
+        Route::post('/dashboard/orders/{id}/newtanamanbatch', 'tambahTanamanBatchBaru')->name('dashboard.kelola.order.tambah.tanamanbatch');
+        Route::post('/dashboard/orders/{id}/delivererAmbilKembali', 'assignDelivererPengambilanKembali')->name('dashboard.kelola.order.tambah.deliverer.ambilkembali');
+        Route::get('/dashboard/orders/{id}/edit', 'tampilkanEditOrder')->name('dashboard.kelola.order.edit.tampilkan');
+        Route::put('/dashboard/orders/{id}/edit', 'editOrder')->name('dashboard.kelola.order.edit');
         Route::delete('/dashboard/orders/hapus/{id}', 'hapusOrder')->name('dashboard.kelola.order.hapus');
+        Route::put('/dashboard/orders/{id}/orderselesai', 'orderSelesai')->name('dashboard.kelola.order.selesai');
+        Route::put('/dashboard/orders/{id}/orderbatalkan', 'orderDibatalkan')->name('dashboard.kelola.order.batalkan');
     });
 
     Route::controller(CustomerController::class)->group(function () {

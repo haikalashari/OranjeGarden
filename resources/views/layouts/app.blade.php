@@ -28,6 +28,7 @@
             </div>
         @endif
         
+        
         @yield('content')           <!-- Konten halaman -->
     </main>
     

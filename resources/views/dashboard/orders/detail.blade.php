@@ -17,10 +17,20 @@
                 ({{ $order->rental_duration }} Hari)
             </p>
         </div>
-        <span class="px-3 py-1 rounded-full text-sm font-semibold self-center
-            {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-            {{ $order->payment_status === 'paid' ? 'Sudah Dibayar' : 'Belum Dibayar' }}
-        </span>
+        <div class="flex flex-col items-start gap-3">
+            <span class="px-3 py-1 rounded-full text-sm font-semibold self-center
+                {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                {{ $order->payment_status === 'paid' ? 'Sudah Dibayar' : 'Belum Dibayar' }}
+            </span>
+            <!-- Button Edit Order -->
+
+            @if ($order->latestStatus->status_category->status === 'Proses Pengantaran')
+            <a href="{{ route('dashboard.kelola.order.edit.tampilkan', $order->id) }}" 
+               class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                Edit Order
+            </a>
+            @endif
+        </div>
     </div>
 
     <!-- Main Content Layout -->
@@ -52,9 +62,25 @@
                 </div>
             </div>
 
-            <!-- Item Order -->
+        <!-- Item Order -->
             <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-                <h2 class="text-lg font-semibold text-orange-600 mb-4">Item dalam Order</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-orange-600">Item dalam Order</h2>
+
+                    <!-- Tombol Tambah Tanaman Batch Baru -->
+                    @if ($order->latestStatus->status_category->status === 'Proses Penggantian Tanaman')
+                        <button onclick="openAddBatchModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                            + Tambah Tanaman Batch Baru
+                        </button>
+                    @endif
+
+                        <!-- Tombol Assign Deliverer Pengambilan Kembali -->
+                    @if ($order->latestStatus->status_category->status === 'Proses Pengambilan Kembali')
+                        <button onclick="openAssignDelivererModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            Assign Deliverer Pengambilan Kembali
+                        </button>
+                    @endif
+                </div>
 
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach ($order->orderItems as $item)
@@ -133,6 +159,28 @@
                     @endforeach
                 </div>
             </div>
+
+                        <!-- Tombol Order Selesai dan Order Dibatalkan -->
+            <div class="flex gap-4 mt-4">
+                <!-- Tombol Order Selesai -->
+                <form action="{{ route('dashboard.kelola.order.selesai', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan order ini?')">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Order Selesai
+                    </button>
+                </form>
+
+                <!-- Tombol Order Dibatalkan -->
+                <form action="{{ route('dashboard.kelola.order.batalkan', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan order ini?')">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        Order Dibatalkan
+                    </button>
+                </form>
+            </div>
+
         </div>
 
     </div>
@@ -144,4 +192,125 @@
     </div>
 
 </div>
+
+
+    <!-- Modal Tambah Tanaman Batch Baru -->
+    <div id="addBatchModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-screen overflow-y-auto">
+            <h2 class="text-2xl font-bold text-orange-600 mb-4">Tambah Tanaman Batch Baru</h2>
+
+            <form id="addBatchForm" action="{{ route('dashboard.kelola.order.tambah.tanamanbatch', $order->id) }}" method="POST">
+                @csrf
+
+                <!-- Pilih Deliverer -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Deliverer</label>
+                    <select name="deliverer_id" class="block w-full p-2 border rounded-lg">
+                        <option value="">-- Pilih Deliverer --</option>
+                        @foreach ($deliverers as $deliverer)
+                            <option value="{{ $deliverer->id }}">{{ $deliverer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Pilih Tanaman -->
+                <div id="plantsSection" class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Tanaman & Jumlah</label>
+
+                    <div class="plant-item flex gap-2 mb-2">
+                        <select name="plants[0][plant_id]" class="block w-full p-2 border rounded-lg">
+                            <option value="">-- Pilih Tanaman --</option>
+                            @foreach ($plants as $plant)
+                                <option value="{{ $plant->id }}">{{ $plant->name }} -- {{ $plant->category }}</option>
+                            @endforeach
+                        </select>
+
+                        <input type="number" name="plants[0][quantity]" placeholder="Jumlah" min="1" class="block w-24 p-2 border rounded-lg">
+
+                        <button type="button" onclick="addPlantItem()" class="bg-orange-500 text-white px-2 rounded hover:bg-orange-600">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeAddBatchModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="assignDelivererModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-screen overflow-y-auto">
+        <h2 class="text-2xl font-bold text-blue-600 mb-4">Assign Deliverer Pengambilan Kembali</h2>
+
+        <form id="assignDelivererForm" action="{{ route('dashboard.kelola.order.tambah.deliverer.ambilkembali', $order->id) }}" method="POST">
+            @csrf
+
+            <!-- Pilih Deliverer -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Deliverer</label>
+                <select name="deliverer_id" class="block w-full p-2 border rounded-lg">
+                    <option value="">-- Pilih Deliverer --</option>
+                    @foreach ($deliverers as $deliverer)
+                        <option value="{{ $deliverer->id }}">{{ $deliverer->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end">
+                <button type="button" onclick="closeAssignDelivererModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    let plantIndex = 1;
+
+    function openAddBatchModal() {
+        document.getElementById('addBatchModal').classList.remove('hidden');
+    }
+
+    function closeAddBatchModal() {
+        document.getElementById('addBatchModal').classList.add('hidden');
+    }
+
+    function addPlantItem() {
+        const plantsSection = document.getElementById('plantsSection');
+
+        const newPlantItem = document.createElement('div');
+        newPlantItem.className = 'plant-item flex gap-2 mb-2';
+        newPlantItem.innerHTML = `
+            <select name="plants[${plantIndex}][plant_id]" class="block w-full p-2 border rounded-lg">
+                <option value="">-- Pilih Tanaman --</option>
+                @foreach ($plants as $plant)
+                    <option value="{{ $plant->id }}">{{ $plant->name }} -- {{ $plant->category }}</option>
+                @endforeach
+            </select>
+
+            <input type="number" name="plants[${plantIndex}][quantity]" placeholder="Jumlah" min="1" class="block w-24 p-2 border rounded-lg">
+
+            <button type="button" class="bg-red-500 text-white px-2 rounded hover:bg-red-600" onclick="this.parentElement.remove()">
+                &times;
+            </button>
+        `;
+        plantsSection.appendChild(newPlantItem);
+        plantIndex++;
+    }
+
+    function openAssignDelivererModal() {
+        document.getElementById('assignDelivererModal').classList.remove('hidden');
+    }
+
+    function closeAssignDelivererModal() {
+        document.getElementById('assignDelivererModal').classList.add('hidden');
+    }
+</script>
 @endsection

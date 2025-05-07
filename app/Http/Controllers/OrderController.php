@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
+use App\Models\StatusCategory;
 use App\Models\OrderDeliverers;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +78,7 @@ class OrderController extends Controller
                 $paymentStatus = 'paid';
             }
 
+
             $order = Order::create([
                 'customer_id' => $customerId,
                 'order_date' => Carbon::now(),
@@ -125,7 +127,9 @@ class OrderController extends Controller
     public function tampilkanDetailOrder($id)
     {
         $user = Auth::user();
+        $deliverers = User::where('role', 'delivery')->get();
 
+        $plants = Plant::all();
         // Ambil data order beserta relasi yang diperlukan
         $order = Order::with([
             'customer', // Relasi ke customer
@@ -145,13 +149,48 @@ class OrderController extends Controller
         // Ambil data invoice jika ada
         $invoices = $order->invoices()->get();
 
-        return view('dashboard.orders.detail', compact('user', 'order', 'orderStatuses', 'deliveries', 'invoices'));
+        return view('dashboard.orders.detail', compact('user', 'order', 'orderStatuses', 'deliveries', 'invoices', 'plants', 'deliverers'));
     }
     
+    public function tampilkanEditOrder($id)
+    {
+        $user = Auth::user();
+        $order = Order::with('LatestStatus')->findOrFail($id);
+        $customers = Customer::all();
+        $plants = Plant::all();
+        $statuses = StatusCategory::all();
+        $deliverers = User::where('role', 'delivery')->get();
+        return view('dashboard.orders.edit', compact('order', 'user', 'customers', 'deliverers', 'plants', 'statuses'));
+    }
 
     public function editOrder(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'items' => 'required|array',
+            'items.*.plant_id' => 'required|exists:plants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        $order = Order::findOrFail($id);
+        
+        try {
+            DB::beginTransaction();
     
+        $order->orderItems()->delete(); // Hapus semua item lama
+        foreach ($validatedData['items'] as $item) {
+            $order->orderItems()->create([
+                'plant_id' => $item['plant_id'],
+                'quantity' => $item['quantity'],
+                'replacement_batch' => 0,
+            ]);
+        }
+
+        DB::commit();
+        return redirect()->route('dashboard.kelola.order.detail', $order->id)->with('success', 'Order berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal memperbarui order: ' . $e->getMessage());
+        }
     }
 
     public function hapusOrder($id)
@@ -185,6 +224,150 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Gagal menghapus order: ' . $e->getMessage());
+        }
+    }
+
+    public function orderSelesai($id)
+    {
+        $order = Order::findOrFail($id);
+
+        try {
+            DB::beginTransaction();
+
+        $latestStatus = $order->status()->latest()->first();
+        if ($latestStatus && $latestStatus->status_category->status === 'Order Selesai') {
+            return redirect()->route('dashboard.kelola.order')->with('error', 'Order sudah diselesaikan sebelumnya.');
+        }
+        if ($latestStatus && $latestStatus->status_category->status === 'Order Dibatalkan') {
+            return redirect()->route('dashboard.kelola.order')->with('error', 'Order sudah dibatalkan sebelumnya.');
+        }
+
+        OrderStatus::create([
+            'order_id' => $id,
+            'status_id' => 5, // ID untuk status "Order Selesai"
+            'created_at' => Carbon::now(),
+        ]);
+
+        $orderDeliverers = OrderDeliverers::where('order_id', $id)->get();
+        foreach ($orderDeliverers as $deliverer) {
+            $deliverer->update([
+                'delivery_photo' => 'Admin Konfirm',
+            ]);
+        }
+
+        DB::commit();
+        return redirect()->route('dashboard.kelola.order')->with('success', 'Order berhasil diselesaikan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menyelesaikan order: ' . $e->getMessage());
+        }
+    }
+
+    public function orderDibatalkan($id)
+    {
+        $order = Order::findOrFail($id);
+
+        try {
+        DB::beginTransaction();
+        $latestStatus = $order->status()->latest()->first();
+        if ($latestStatus && $latestStatus->status_category->status === 'Order Selesai') {
+            return redirect()->route('dashboard.kelola.order')->with('error', 'Order sudah diselesaikan sebelumnya.');
+        }
+        if ($latestStatus && $latestStatus->status_category->status === 'Order Dibatalkan') {
+            return redirect()->route('dashboard.kelola.order')->with('error', 'Order sudah dibatalkan sebelumnya.');
+        }
+
+        OrderStatus::create([
+            'order_id' => $id,
+            'status_id' => 6, // ID untuk status "Order Dibatalkan"
+            'created_at' => Carbon::now(),
+        ]);
+
+        $orderDeliverers = OrderDeliverers::where('order_id', $id)->get();
+        foreach ($orderDeliverers as $deliverer) {
+            $deliverer->delete();
+        }
+
+        return redirect()->route('dashboard.kelola.order')->with('success', 'Order berhasil dibatalkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal membatalkan order: ' . $e->getMessage());
+        }
+    }
+
+    public function tambahTanamanBatchBaru(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'plants' => 'required|array',
+            'plants.*.plant_id' => 'required|exists:plants,id',
+            'plants.*.quantity' => 'required|integer|min:1',
+            'deliverer_id' => 'required|exists:users,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $order = Order::findOrFail($id);
+
+            foreach ($validated['plants'] as $plant) {
+                $order->orderItems()->create([
+                    'plant_id' => $plant['plant_id'],
+                    'quantity' => $plant['quantity'],
+                    'replacement_batch' => $order->orderItems()->max('replacement_batch') + 1, // Tambahkan batch baru
+                ]);
+            }
+
+            $batchDeliverer = OrderDeliverers::where('order_id', $id)
+                ->where('created_at')
+                ->latest()
+                ->get();
+
+            $orderDeliverers = new OrderDeliverers();
+            $derliverersBatchBaru = $orderDeliverers->create([
+                'order_id' => $id,
+                'user_id' => $validated['deliverer_id'],
+                'delivery_batch' => $batchDeliverer->delivery_batch + 1, // Batch baru
+                'delivery_photo' => null,
+                'status' => 'Mengganti',
+            ]);
+            
+
+            DB::commit();
+            return redirect()->route('dashboard.kelola.order.detail', $order->id)->with('success', 'Tanaman batch baru berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menambahkan batch tanaman baru: ' . $e->getMessage());
+        }
+    }
+
+    public function assignDelivererPengambilanKembali(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'deliverer_id' => 'required|exists:users,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $order = Order::findOrFail($id);
+
+            $batchDeliverer = OrderDeliverers::where('order_id', $id)
+                ->latest('created_at')
+                ->first();
+
+
+            $orderDeliverers = new OrderDeliverers();
+            $orderDeliverers->create([
+                'order_id' => $id,
+                'user_id' => $validated['deliverer_id'],
+                'delivery_batch' => $batchDeliverer->delivery_batch + 1, // Batch baru
+                'delivery_photo' => null,
+                'status' => 'Ambil Kembali',
+            ]);
+
+            DB::commit();
+            return redirect()->route('dashboard.kelola.order.detail', $order->id)->with('success', 'Pengantar pengambilan kembali berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menambahkan pengantar pengambilan kembali: ' . $e->getMessage());
         }
     }
 }
