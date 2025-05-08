@@ -11,8 +11,9 @@
     </div>
 
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 gap-3">
+    <form action="{{ route('dashboard.kelola.plant') }}" method="GET" class="relative w-full md:w-auto">
         <label for="table-search" class="sr-only">Search</label>
-        <div class="relative w-full md:w-auto">
+        <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -20,8 +21,9 @@
                         clip-rule="evenodd" />
                 </svg>
             </div>
-            <input type="text" id="table-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for products">
+            <input type="text" name="search" id="table-search" value="{{ request('search') }}" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari Nama Tanaman">
         </div>
+    </form>
 
         <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Tambah Tanaman</button>
     </div>

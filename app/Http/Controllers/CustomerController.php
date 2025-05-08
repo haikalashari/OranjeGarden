@@ -14,10 +14,15 @@ class CustomerController extends Controller
     public function tampilkanDataCustomer()
     {
         $user = Auth::user();
-        $customers = Customer::with('orders')
+        $query = Customer::with('orders')
         ->withCount('orders')
-        ->withSum('orders', 'total_price')
-        ->paginate(15);
+        ->withSum('orders', 'total_price');
+
+        if (request()->has('search') && request()->search != '') {
+            $query->where('name', 'like', '%' . request()->search . '%');
+        }
+
+        $customers = $query->orderBy('created_at', 'desc')->paginate(15);
         return view('dashboard.customers.index', compact('customers', 'user'));
     }
 

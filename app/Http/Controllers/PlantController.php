@@ -17,7 +17,13 @@ class PlantController extends Controller
     public function tampilkanDataPlant()
     {
         $user = Auth::user();
-        $plants = Plant::paginate(15);
+        $query = Plant::query();
+
+        if (request()->has('search') && request()->search != '') {
+            $query->where('name', 'like', '%' . request()->search . '%');
+        }
+    
+        $plants = $query->paginate(15);
         return view('dashboard.plants.index', compact('plants', 'user'));
     }
 

@@ -18,10 +18,19 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function tampilkanDataOrder()
+    public function tampilkanDataOrder(Request $request)
     {
         $user = Auth::user();
-        $order = Order::with('LatestStatus')->paginate(10);
+        $query = Order::with(['customer', 'latestStatus.status_category']);
+
+        // Check if a search query exists
+        if ($request->has('search') && $request->search != '') {
+            $query->whereHas('customer', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
+            });
+        }
+        $order = $query->paginate(10);
+        
         $customers = Customer::all();
         $plants = Plant::all();
         $deliverers = User::where('role', 'delivery ')->get();
