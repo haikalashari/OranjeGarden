@@ -7,7 +7,6 @@
 @section('content')
 <div class="mx-auto p-6 space-y-10">
 
-    <!-- Header & Payment Status -->
     <div class="flex justify-between items-start flex-wrap gap-4">
         <div>
             <h1 class="text-2xl font-bold text-orange-600">Detail Order #{{ $order->id }}</h1>

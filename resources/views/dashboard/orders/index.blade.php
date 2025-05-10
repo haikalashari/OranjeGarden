@@ -35,7 +35,8 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 font-semibold">Nomor</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Nama Customer</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Tanggal Order Dibuat</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Tanggal Order</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Tanggal Sewa Berakhir</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Durasi Sewa</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Alamat Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Harga Order</th>
@@ -49,7 +50,8 @@
                     <tr class="border-b last:rounded-b-lg last:border-none hover:bg-orange-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $index + 1 }}</td>
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $item->customer->name }}</td>
-                        <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->order_date)->translatedFormat('d F Y') }}</td>                        
+                        <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->order_date)->translatedFormat('d F Y') }}</td>      
+                        <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->end_date)->translatedFormat('d F Y') }}</td>                  
                         <td class="px-6 py-4">{{ $item->rental_duration }} Hari</td>
                         <td class="px-6 py-4">{{ $item->delivery_address}}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>

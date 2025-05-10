@@ -13,7 +13,11 @@
 <body class="bg-gray-50 dark:bg-gray-900">
 
     @include('layouts.partials.header')     <!-- Navbar -->
-    @include('layouts.partials.sidebar')    <!-- Sidebar -->
+    @if (Auth::user()->role === 'admin')
+        @include('layouts.partials.sidebar') <!-- Sidebar untuk Admin -->
+    @elseif (Auth::user()->role === 'delivery')
+        @include('layouts.partials.sidebar_deliverer') <!-- Sidebar untuk Delivery -->
+    @endif
 
     <main class="p-4 sm:ml-64 mt-16">
         @if (session('error'))
