@@ -376,18 +376,19 @@ class OrderController extends Controller
             DB::beginTransaction();
             $order = Order::findOrFail($id);
 
+            $replacement_batch = $order->orderItems()->max('replacement_batch') + 1; // Ambil batch terakhir dan tambahkan 1
+
             foreach ($validated['plants'] as $plant) {
                 $order->orderItems()->create([
                     'plant_id' => $plant['plant_id'],
                     'quantity' => $plant['quantity'],
-                    'replacement_batch' => $order->orderItems()->max('replacement_batch') + 1, // Tambahkan batch baru
+                    'replacement_batch' => $replacement_batch, // Tambahkan batch baru
                 ]);
             }
 
             $batchDeliverer = OrderDeliverers::where('order_id', $id)
-                ->where('created_at')
-                ->latest()
-                ->get();
+                ->latest('created_at')
+                ->first();
 
             $orderDeliverers = new OrderDeliverers();
             $derliverersBatchBaru = $orderDeliverers->create([

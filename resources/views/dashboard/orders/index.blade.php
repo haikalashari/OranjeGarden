@@ -38,6 +38,7 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Tanggal Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Tanggal Sewa Berakhir</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Durasi Sewa</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Hari Berjalan</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Alamat Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Harga Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Pembayaran</th>
@@ -53,6 +54,9 @@
                         <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->order_date)->translatedFormat('d F Y') }}</td>      
                         <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->end_date)->translatedFormat('d F Y') }}</td>                  
                         <td class="px-6 py-4">{{ $item->rental_duration }} Hari</td>
+                        <td class="px-6 py-4">
+                        {{ \Carbon\Carbon::parse($item->order_date)->startOfDay()->diffInDays(\Carbon\Carbon::now()->startOfDay()) + 1 }} Hari
+                        </td>
                         <td class="px-6 py-4">{{ $item->delivery_address}}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
                         @if($item->payment_status == 'paid')
@@ -252,7 +256,7 @@
                 
                 // Kurangi satu hari dari tanggal akhir
                 const adjustedEndDate = new Date(selectedDates[1]);
-                adjustedEndDate.setDate(adjustedEndDate.getDate() - 1);
+                adjustedEndDate.setDate(adjustedEndDate.getDate());
                 document.getElementById('end_date').value = toDateInputValue(adjustedEndDate);
             }
         }

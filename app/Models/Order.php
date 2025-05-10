@@ -53,7 +53,7 @@ class Order extends Model
 
     public function latestStatus()
     {
-        return $this->hasOne(OrderStatus::class, 'order_id')->latest();
+        return $this->hasOne(OrderStatus::class)->latestOfMany();
     }
 
     public function invoices()

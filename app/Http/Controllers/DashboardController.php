@@ -41,9 +41,14 @@ class DashboardController extends Controller
 
         $lowStockPlants = Plant::where('stock', '<', 10)->orderBy('stock', 'asc')->get();
 
-        $activeOrdersList = Order::whereHas('latestStatus.status_category', function ($query) {
-            $query->where('status', 'Dalam Masa Sewa');
-        })->with(['customer', 'orderItems.plant', 'latestStatus.status_category'])->paginate(3);
+        $activeOrdersList = Order::whereRelation('latestStatus.status_category', 'status', 'Dalam Masa Sewa')
+            ->with(['customer', 'orderItems.plant', 'latestStatus.status_category'])
+            ->get()
+            ->map(function ($order) {
+                $latestBatch = $order->orderItems->max('replacement_batch');
+                $order->orderItems = $order->orderItems->where('replacement_batch', $latestBatch);
+                return $order;
+            });
 
         $totalRevenue = Order::where('payment_status', 'paid')->sum('total_price');
 
