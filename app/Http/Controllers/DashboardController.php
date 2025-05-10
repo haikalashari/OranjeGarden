@@ -43,7 +43,9 @@ class DashboardController extends Controller
 
         $activeOrdersList = Order::whereHas('latestStatus.status_category', function ($query) {
             $query->where('status', 'Dalam Masa Sewa');
-        })->with(['customer', 'orderItems.plant', 'latestStatus.status_category'])->get();
+        })->with(['customer', 'orderItems.plant', 'latestStatus.status_category'])->paginate(3);
+
+        $totalRevenue = Order::where('payment_status', 'paid')->sum('total_price');
 
         return view('dashboard.index', compact(
             'user',
@@ -54,7 +56,8 @@ class DashboardController extends Controller
             'orderChartLabels',
             'orderChartData',
             'lowStockPlants',
-            'activeOrdersList'
+            'activeOrdersList',
+            'totalRevenue'
         ));
     }
 }
