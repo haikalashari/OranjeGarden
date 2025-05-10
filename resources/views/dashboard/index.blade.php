@@ -122,7 +122,7 @@
                                 <td class="px-4 py-2 whitespace-nowrap">{{ $order->customer->name }}</td>
                                 <td class="px-4 py-2">
                                     @foreach ($order->orderItems as $item)
-                                        <div class="mb-1">{{ $item->plant->name }} - {{ $item->plant->category}} <span class="text-xs">(x{{ $item->quantity }})</span><span class="text-xs">(Batch: {{ $item->replacement_batch }})</span></div>
+                                        <div class="mb-1">{{ $item->plant->name }} - {{ $item->plant->category}} <span class="text-xs">(x{{ $item->quantity }}) </span><span class="text-xs">(Batch: {{ $item->replacement_batch }})</span></div>
                                     @endforeach
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap">{{ \Carbon\Carbon::parse($order->order_date)->translatedFormat('d M Y') }}</td>
