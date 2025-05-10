@@ -79,6 +79,14 @@ class OrderController extends Controller
             
             foreach ($validatedData['plants'] as $plantData) {
                 $plant = Plant::findOrFail($plantData['plant_id']);
+
+                if ($plant->stock < $plantData['quantity']) {
+                    throw new \Exception("Stok tanaman {$plant->name} tidak mencukupi.");
+                }
+
+                $plant->stock -= $plantData['quantity'];
+                $plant->save();
+
                 $totalPrice += $plant->price * $plantData['quantity'];
             }
             
@@ -141,7 +149,6 @@ class OrderController extends Controller
         $deliverers = User::where('role', 'delivery')->get();
 
         $plants = Plant::all();
-        // Ambil data order beserta relasi yang diperlukan
         $order = Order::with([
             'customer', // Relasi ke customer
             'orderItems', // Relasi ke item order
@@ -151,13 +158,10 @@ class OrderController extends Controller
             'deliverer.user', // Relasi ke user pengantar
         ])->findOrFail($id);
 
-        // Ambil riwayat status order
         $orderStatuses = $order->status()->with('status_category')->get();
 
-        // Ambil riwayat pengiriman
         $deliveries = $order->deliverer()->get();
 
-        // Ambil data invoice jika ada
         $invoices = $order->invoices()->get();
 
         return view('dashboard.orders.detail', compact('user', 'order', 'orderStatuses', 'deliveries', 'invoices', 'plants', 'deliverers'));
@@ -215,17 +219,14 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // Hapus bukti pembayaran lama jika ada
             if ($order->payment_proof && Storage::exists('public/' . $order->payment_proof)) {
                 Storage::delete('public/' . $order->payment_proof);
             }
 
-            // Simpan bukti pembayaran baru
             $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
             $order->payment_proof = $paymentProofPath;
             $order->save();
 
-            // Update status pembayaran
             $order->payment_status = 'paid';
             $order->save();
 
@@ -376,8 +377,25 @@ class OrderController extends Controller
             DB::beginTransaction();
             $order = Order::findOrFail($id);
 
-            $replacement_batch = $order->orderItems()->max('replacement_batch') + 1; // Ambil batch terakhir dan tambahkan 1
+            $previousBatch = $order->orderItems()->where('replacement_batch', $order->orderItems()->max('replacement_batch'))->get();
+            foreach ($previousBatch as $item) {
+                $plant = Plant::findOrFail($item->plant_id);
+                $plant->stock += $item->quantity;
+                $plant->save();
+            }
 
+            foreach ($validated['plants'] as $plantData) {
+                $plant = Plant::findOrFail($plantData['plant_id']);
+
+                if ($plant->stock < $plantData['quantity']) {
+                    throw new \Exception("Stok tanaman {$plant->name} tidak mencukupi.");
+                }
+
+                $plant->stock -= $plantData['quantity'];
+                $plant->save();
+            }
+
+            $replacement_batch = $order->orderItems()->max('replacement_batch') + 1; // Ambil batch terakhir dan tambahkan 1
             foreach ($validated['plants'] as $plant) {
                 $order->orderItems()->create([
                     'plant_id' => $plant['plant_id'],

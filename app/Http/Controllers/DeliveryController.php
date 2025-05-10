@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Plant;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use App\Models\OrderDeliverers;
@@ -93,6 +94,13 @@ class DeliveryController extends Controller
                     'status_id' => 2, // Order Dalam Masa Sewa
                 ]);
             } elseif ($status === 'Proses Pengambilan Kembali') {
+                $lastBatch = $order->orderItems()->where('replacement_batch', $order->orderItems()->max('replacement_batch'))->get();
+                foreach ($lastBatch as $item) {
+                    $plant = Plant::findOrFail($item->plant_id);
+                    $plant->stock += $item->quantity;
+                    $plant->save();
+                }
+
                 OrderStatus::create([
                     'order_id' => $order->id,
                     'status_id' => 5, // Order Selesai
