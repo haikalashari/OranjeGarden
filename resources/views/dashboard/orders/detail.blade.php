@@ -52,12 +52,11 @@
                     </div>
                     <!-- Bukti Pembayaran -->
                     <div class="flex-shrink-0 self-start">
-                        @if ($order->payment_proof)
-                            <p class="font-medium mb-2">Bukti Pembayaran:</p>
-                            <img src="{{ asset('storage/' . $order->payment_proof) }}" alt="Bukti Pembayaran" class="h-40 w-40 object-cover rounded-lg border">
-                        @else
-                            <p class="text-xs text-gray-500 italic">Tidak ada bukti pembayaran.</p>
-                        @endif
+                        <p class="font-medium mb-2">Bukti Pembayaran:</p>
+                        <button onclick="openPaymentProofModal('{{ $order->payment_proof ? asset('storage/' . $order->payment_proof) : '' }}')" 
+                                class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                            Kelola Bukti Pembayaran
+                        </button>
                     </div>
                 </div>
             </div>
@@ -283,6 +282,46 @@
         </form>
     </div>
 </div>
+
+
+
+<div id="paymentProofModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-screen overflow-y-auto">
+        <h2 class="text-2xl font-bold text-orange-600 mb-4">Kelola Bukti Pembayaran</h2>
+
+        <!-- Preview Bukti Pembayaran -->
+        <div id="paymentProofPreview" class="mb-4 hidden">
+            <img id="paymentProofImage" src="" alt="Bukti Pembayaran" class="h-40 w-40 object-cover rounded-lg border mx-auto">
+            <div class="flex justify-end mt-4">
+            </div>
+        </div>
+
+        <!-- Form Upload Bukti Pembayaran -->
+        <form id="paymentProofForm" action="{{ route('dashboard.kelola.order.editPaymentProof', $order->id) }}" method="POST" enctype="multipart/form-data" class="hidden">
+            @csrf
+            <div class="mb-4">
+                <label for="payment_proof" class="block text-sm font-medium text-gray-700 mb-2">Upload Bukti Pembayaran</label>
+                <input type="file" name="payment_proof" id="payment_proof" accept="image/*" class="block w-full p-2 border rounded-lg">
+            </div>
+            <div class="flex justify-end gap-4">
+                <button type="button" onclick="closePaymentProofModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-lg">Simpan</button>
+            </div>
+        </form>
+
+        <!-- Tombol Hapus Bukti Pembayaran -->
+        <form id="deletePaymentProofForm" action="{{ route('dashboard.kelola.order.deletePaymentProof', $order->id) }}" method="POST" class="hidden">
+            @csrf
+            @method('DELETE')
+            <div class="flex justify-between gap-4">
+            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full">
+                Hapus Bukti Pembayaran
+            </button>
+            <button type="button" onclick="closePaymentProofModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -326,6 +365,34 @@
 
     function closeAssignDelivererModal() {
         document.getElementById('assignDelivererModal').classList.add('hidden');
+    }
+
+    function openPaymentProofModal(imageUrl = null) {
+        const modal = document.getElementById('paymentProofModal');
+        const preview = document.getElementById('paymentProofPreview');
+        const image = document.getElementById('paymentProofImage');
+        const uploadForm = document.getElementById('paymentProofForm');
+        const deleteForm = document.getElementById('deletePaymentProofForm');
+
+        if (imageUrl) {
+            // Jika ada bukti pembayaran, tampilkan preview dan tombol hapus
+            preview.classList.remove('hidden');
+            image.src = imageUrl;
+            uploadForm.classList.add('hidden');
+            deleteForm.classList.remove('hidden');
+        } else {
+            // Jika tidak ada bukti pembayaran, tampilkan form upload
+            preview.classList.add('hidden');
+            uploadForm.classList.remove('hidden');
+            deleteForm.classList.add('hidden');
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closePaymentProofModal() {
+        const modal = document.getElementById('paymentProofModal');
+        modal.classList.add('hidden');
     }
 </script>
 @endsection

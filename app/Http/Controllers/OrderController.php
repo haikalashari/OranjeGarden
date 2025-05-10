@@ -204,6 +204,60 @@ class OrderController extends Controller
         }
     }
 
+    public function editPaymentProof(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Validasi file gambar
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Hapus bukti pembayaran lama jika ada
+            if ($order->payment_proof && Storage::exists('public/' . $order->payment_proof)) {
+                Storage::delete('public/' . $order->payment_proof);
+            }
+
+            // Simpan bukti pembayaran baru
+            $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+            $order->payment_proof = $paymentProofPath;
+            $order->save();
+
+            // Update status pembayaran
+            $order->payment_status = 'paid';
+            $order->save();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Bukti pembayaran berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memperbarui bukti pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    public function deletePaymentProof($id)
+    {
+        $order = Order::findOrFail($id);
+
+        try {
+            if ($order->payment_proof && Storage::exists('public/' . $order->payment_proof)) {
+                Storage::delete('public/' . $order->payment_proof);
+            }
+
+            $order->payment_proof = null;
+            $order->save();
+
+            $order->payment_status = 'unpaid';
+            $order->save();
+
+            return redirect()->back()->with('success', 'Bukti pembayaran berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus bukti pembayaran: ' . $e->getMessage());
+        }
+    }
+
     public function hapusOrder($id)
     {
         $order = Order::findOrFail($id);
