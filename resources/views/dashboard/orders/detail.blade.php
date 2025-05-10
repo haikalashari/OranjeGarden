@@ -182,13 +182,28 @@
             </div>
 
         </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-orange-600 mb-4">Invoice</h2>
 
-    </div>
+                <!-- Field untuk Biaya Tambahan -->
+                <form action="{{ route('dashboard.kelola.order.generate.invoice', $order->id) }}" method="GET">
+                    <div class="mb-4">
+                        <label for="installation_fee" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Biaya Instalasi</label>
+                        <input type="number" name="installation_fee" id="installation_fee" value="0" min="0" class="block w-full p-2 border rounded-lg text-sm text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600">
+                    </div>
 
-    <!-- Invoice Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-orange-600 mb-2">Invoice</h2>
-        <p class="text-sm text-gray-500 italic">Fitur invoice akan tersedia di sini.</p>
+                    <!-- Field untuk Keterangan -->
+                    <div class="mb-4">
+                        <label for="invoice_note" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Keterangan</label>
+                        <textarea name="invoice_note" id="invoice_note" rows="3" placeholder="Tambahkan keterangan untuk invoice..." class="block w-full p-2 border rounded-lg text-sm text-gray-900 dark:text-white dark:bg-gray-700 dark:border-gray-600"></textarea>
+                    </div>
+
+                    <!-- Tombol Generate Invoice -->
+                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        Generate Invoice
+                    </button>
+                </form>
+            </div> 
     </div>
 
 </div>

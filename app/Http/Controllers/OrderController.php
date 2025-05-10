@@ -12,9 +12,11 @@ use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use App\Models\StatusCategory;
 use App\Models\OrderDeliverers;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -380,6 +382,109 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Gagal menambahkan pengantar pengambilan kembali: ' . $e->getMessage());
+        }
+    }
+
+    public function generateInvoice($id)
+    {
+        try {
+            // Mulai transaksi database
+            DB::beginTransaction();
+
+            // Ambil data order berdasarkan ID
+            $order = Order::with(['customer', 'orderItems.plant'])->findOrFail($id);
+
+            // Buat array untuk menyimpan data order items yang dikelompokkan
+            $groupedItems = [
+                'tanaman kecil' => ['quantity' => 0, 'amount' => 0],
+                'tanaman sedang' => ['quantity' => 0, 'amount' => 0],
+                'tanaman besar' => ['quantity' => 0, 'amount' => 0],
+            ];
+
+            $totalAmount = 0;
+
+            // Kelompokkan order items berdasarkan kategori dan hitung total quantity dan amount
+            foreach ($order->orderItems->where('replacement_batch', 0) as $item) { // Hanya batch 0
+                $category = $item->plant->category ?? 'Uncategorized';
+                $amount = $item->quantity * $item->plant->price;
+
+                if ($category === 'kecil') {
+                    $groupedItems['tanaman kecil']['quantity'] += $item->quantity;
+                    $groupedItems['tanaman kecil']['amount'] += $amount;
+                } elseif ($category === 'sedang') {
+                    $groupedItems['tanaman sedang']['quantity'] += $item->quantity;
+                    $groupedItems['tanaman sedang']['amount'] += $amount;
+                } elseif ($category === 'besar') {
+                    $groupedItems['tanaman besar']['quantity'] += $item->quantity;
+                    $groupedItems['tanaman besar']['amount'] += $amount;
+                }
+
+                $totalAmount += $amount;
+            }
+
+            // Cek apakah total amount dari perhitungan sama dengan total_price dari tabel orders
+            if ($totalAmount != $order->total_price) {
+                return redirect()->back()->with('error', 'Total amount tidak sesuai dengan total_price dari order.');
+            }
+
+            // Siapkan biaya instalasi dan keterangan
+            $installationFee = request('installation_fee', 0);
+            $invoiceNote = request('invoice_note', ''); // Ambil keterangan dari form
+            $grandTotal = $totalAmount + $installationFee;
+
+            // Generate nomor invoice
+            $lastInvoice = DB::table('invoices')->latest('id')->first();
+            $invoiceNumber = 'INV-' . str_pad(($lastInvoice->id ?? 0) + 1, 6, '0', STR_PAD_LEFT);
+
+            // Cek apakah invoice untuk order ini sudah ada
+            $existingInvoice = DB::table('invoices')->where('order_id', $order->id)->first();
+            if ($existingInvoice) {
+                // Hapus file PDF lama dari storage
+                if (Storage::exists('public/' . $existingInvoice->invoice_pdf_path)) {
+                    Storage::delete('public/' . $existingInvoice->invoice_pdf_path);
+                }
+
+                // Hapus data invoice lama dari database
+                DB::table('invoices')->where('id', $existingInvoice->id)->delete();
+            }
+
+            // Data untuk dikirim ke view
+            $data = [
+                'order' => $order,
+                'groupedItems' => $groupedItems,
+                'totalAmount' => $totalAmount,
+                'installationFee' => $installationFee,
+                'grandTotal' => $grandTotal,
+                'invoiceNumber' => $invoiceNumber,
+                'invoiceNote' => $invoiceNote,
+            ];
+
+            // Generate PDF menggunakan view
+            $pdf = Pdf::loadView('invoices.template', $data)
+            ->setPaper('a4', 'portrait'); 
+            
+            // Simpan PDF ke storage
+            $fileName = 'invoices/invoice-' . $order->id . '.pdf';
+            Storage::put('public/' . $fileName, $pdf->output());
+
+            // Simpan data invoice ke database
+            DB::table('invoices')->insert([
+                'order_id' => $order->id,
+                'invoice_number' => $invoiceNumber,
+                'invoice_pdf_path' => $fileName,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Commit transaksi database
+            DB::commit();
+
+            // Download PDF
+            return $pdf->download('invoice-' . $order->id . '.pdf');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi error
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal membuat invoice: ' . $e->getMessage());
         }
     }
 }
