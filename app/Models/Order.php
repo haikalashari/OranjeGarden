@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\OrderItem;
+use App\Models\OrderDeliverers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,17 +17,16 @@ class Order extends Model
     protected $fillable = [
         'customer_id',
         'order_date',
-        'rental_duration',
+        'end_date',
         'delivery_address',
-        'total_price',
         'payment_status',
         'payment_proof',
-        'delivery_photo',
-        'assigned_deliverer_id'
+        'total_price',
     ];
 
     protected $casts = [
         'order_date' => 'date',
+        'end_date' => 'date',
         'total_price' => 'decimal:2',
     ];
 
@@ -38,7 +38,7 @@ class Order extends Model
 
     public function deliverer()
     {
-        return $this->belongsTo(User::class, 'assigned_deliverer_id');
+        return $this->hasMany(OrderDeliverers::class);
     }
 
     public function orderItems()
@@ -54,5 +54,18 @@ class Order extends Model
     public function latestStatus()
     {
         return $this->hasOne(OrderStatus::class, 'order_id')->latest();
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoices::class);
+    }
+
+    protected $appends = ['rental_duration'];
+    
+    public function getRentalDurationAttribute()
+    {
+        return \Carbon\Carbon::parse($this->order_date)
+            ->diffInDays(\Carbon\Carbon::parse($this->end_date)->subDay()) + 1;
     }
 }

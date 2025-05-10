@@ -30,6 +30,7 @@ class OrderItemFactory extends Factory
             'order_id' => $order->id, // Use existing order ID
             'plant_id' => Plant::inRandomOrder()->first()->id,
             'quantity' => $this->faker->numberBetween(1, 10),
+            'replacement_batch' => $this->faker->numberBetween(0, 1), // 50% chance of being true
         ];
     }
 

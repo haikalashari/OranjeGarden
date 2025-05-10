@@ -9,10 +9,10 @@
     <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold text-orange-600">Halaman Pelanggan</h1>
     </div>
-
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 gap-3">
+    <form action="{{ route('dashboard.kelola.customer') }}" method="GET" class="relative w-full md:w-auto">
         <label for="table-search" class="sr-only">Search</label>
-        <div class="relative w-full md:w-auto">
+        <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -20,8 +20,9 @@
                         clip-rule="evenodd" />
                 </svg>
             </div>
-            <input type="text" id="table-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for products">
+            <input type="text" name="search" id="table-search" value="{{ request('search') }}" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari Nama Customer">
         </div>
+    </form>
 
         <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Tambah Pelanggan</button>
     </div>
@@ -33,6 +34,7 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 font-semibold">Nama</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Nomor Hp</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Nomor Hp Pengganti</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Email</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Pengeluaran Uang</th>
@@ -44,11 +46,12 @@
                     <tr class="border-b last:rounded-b-lg last:border-none hover:bg-orange-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $customer->name }}</td>
                         <td class="px-6 py-4">{{ $customer->contact_no }}</td>
+                        <td class="px-6 py-4">{{ $customer->secondary_contact_no }}</td>
                         <td class="px-6 py-4">{{ $customer->email }}</td>
-                        <td class="px-6 py-4">{{ $customer->order_count}}</td>
-                        <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($customer->order_sum_total_price, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4">{{ $customer->orders_count }} </td>
+                        <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($customer->orders_sum_total_price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                    
-                            <a href="#" onclick="openEditModal({{ $customer->id }}, '{{ $customer->name }}', '{{ $customer->contact_no }}', '{{ $customer->email }}', '{{ $customer->total_orders }}', '{{ $customer->total_spent }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
+                            <a href="#" onclick="openEditModal({{ $customer->id }}, '{{ $customer->name }}', '{{ $customer->contact_no }}', '{{ $customer->secondary_contact_no }}', '{{ $customer->email }}', '{{ $customer->total_orders }}', '{{ $customer->total_spent }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.customer.hapus', $customer->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus data customer ini?');">
                                 @csrf
                                 @method('DELETE')
@@ -67,6 +70,9 @@
             </table>
         </div>
     </div>
+    <div class="mt-4">
+        {{ $customers->links() }}
+    </div>
 </div>
 
 
@@ -83,6 +89,10 @@
             <div class="mb-4">
                 <label for="contact_no" class="block text-sm font-medium text-gray-700">Nomor Hp</label>
                 <input type="tel" name="contact_no" id="contact_no" class="block w-full mt-1 p-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label for="secondary_contact_no" class="block text-sm font-medium text-gray-700">Nomor Hp Pengganti</label>
+                <input type="tel" name="secondary_contact_no" id="secondary_contact_no" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -110,6 +120,10 @@
             <div class="mb-4">
                 <label for="edit-contact_no" class="block text-sm font-medium text-gray-700">Nomor Hp</label>
                 <input type="tel" name="contact_no" id="edit-contact_no" class="block w-full mt-1 p-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label for="edit-secondary_contact_no" class="block text-sm font-medium text-gray-700">Nomor Hp Pengganti</label>
+                <input type="tel" name="secondary_contact_no" id="edit-secondary_contact_no" class="block w-full mt-1 p-2 border rounded-lg">
             </div>
             <div class="mb-4">
                 <label for="edit-email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -140,17 +154,19 @@
     }
 
     // Function to open the edit plant modal with pre-filled data
-    function openEditModal(id, name, contact_no, email, total_orders, total_spent) {
+    function openEditModal(id, name, contact_no, secondary_contact_no, email, total_orders, total_spent) {
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
         const editName = document.getElementById('edit-name');
         const editContactNo = document.getElementById('edit-contact_no');
+        const editSecondaryContactNo = document.getElementById('edit-secondary_contact_no');
         const editEmail = document.getElementById('edit-email');
 
 
         // Set form values
         editName.value = name;
         editContactNo.value = contact_no;
+        editSecondaryContactNo.value = secondary_contact_no; 
         editEmail.value = email;
 
         // Set the form action with the correct URL and ID

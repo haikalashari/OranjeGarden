@@ -17,7 +17,13 @@ class PlantController extends Controller
     public function tampilkanDataPlant()
     {
         $user = Auth::user();
-        $plants = Plant::all();
+        $query = Plant::query();
+
+        if (request()->has('search') && request()->search != '') {
+            $query->where('name', 'like', '%' . request()->search . '%');
+        }
+    
+        $plants = $query->paginate(15);
         return view('dashboard.plants.index', compact('plants', 'user'));
     }
 
@@ -28,6 +34,7 @@ class PlantController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer',
             'price' => 'required|numeric',
+            'category' => 'required|string|in:kecil,besar',
         ]);
 
         DB::beginTransaction();
@@ -78,6 +85,7 @@ class PlantController extends Controller
             'photo' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer',
             'price' => 'required|numeric',
+            'category' => 'required|string|in:kecil,besar',
         ]);
 
         DB::beginTransaction();

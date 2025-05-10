@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Customer;
+use App\Models\OrderStatus;
+use App\Models\StatusCategory;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -28,12 +30,11 @@ class OrdersTableSeeder extends Seeder
         Order::create([
             'customer_id' => $customer->id,
             'order_date' => Carbon::today(),
-            'rental_duration' => 7, 
+            'end_date' => Carbon::today()->addDays(30),
             'delivery_address' => '123 Main St, Anytown, AN 12345',
-            'total_price' => 450000.00,
             'payment_status' => 'paid',
             'payment_proof' => 'payment_proofs/sample.jpg',
-            'assigned_deliverer_id' => $deliverer->id,
+            'total_price' => 150.00,
         ]);
 
         // Add more sample orders if needed

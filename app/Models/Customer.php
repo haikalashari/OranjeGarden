@@ -17,10 +17,11 @@ class Customer extends Model
     protected $fillable = [
         'name',
         'contact_no',
+        'secondary_contact_no',
         'email',
     ];
 
-    public function order()
+    public function orders()
     {
         return $this->hasMany(Order::class);
     }

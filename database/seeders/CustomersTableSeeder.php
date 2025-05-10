@@ -18,6 +18,7 @@ class CustomersTableSeeder extends Seeder
         Customer::create([
             'name' => 'John Doe',
             'contact_no' => '08123456789',
+            'secondary_contact_no' => '08987654321',
             'email' => 'johndoe@example.com',
         ]);
 

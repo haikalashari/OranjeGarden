@@ -17,7 +17,7 @@ class OrderStatusTableSeeder extends Seeder
     {
         $orders = Order::all();
 
-        $waitingPaymentStatus = StatusCategory::where('status', 'Menunggu Pembayaran')->first();
+        $waitingPaymentStatus = StatusCategory::where('status', 'Proses Pengantaran')->first();
 
         foreach ($orders as $order) {
             OrderStatus::create([

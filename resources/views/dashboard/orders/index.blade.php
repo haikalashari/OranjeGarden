@@ -11,8 +11,9 @@
     </div>
 
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 gap-3">
+    <form action="{{ route('dashboard.kelola.order') }}" method="GET" class="relative w-full md:w-auto">
         <label for="table-search" class="sr-only">Search</label>
-        <div class="relative w-full md:w-auto">
+        <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -20,8 +21,9 @@
                         clip-rule="evenodd" />
                 </svg>
             </div>
-            <input type="text" id="table-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for products">
+            <input type="text" name="search" id="table-search" value="{{ request('search') }}" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari Nama Customer">
         </div>
+    </form>
 
         <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Tambah Order</button>
     </div>
@@ -31,24 +33,24 @@
             <table class="w-full text-sm text-left text-gray-700 dark:text-gray-300">
                 <thead class="text-xs text-white uppercase bg-orange-500 dark:bg-orange-600">
                     <tr>
-                        <th scope="col" class="px-6 py-3 font-semibold">Order ID</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Nomor</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Nama Customer</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Tanggal Order Dibuat</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Durasi Rental</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Durasi Sewa</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Alamat Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Harga Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Pembayaran</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Order</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Pengantar</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Action</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800">
-                    @foreach ($order as $item)
+                    @foreach ($order as $index => $item)
                     <tr class="border-b last:rounded-b-lg last:border-none hover:bg-orange-50 dark:hover:bg-gray-700">
-                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $item->id }}</td>
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $index + 1 }}</td>
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $item->customer->name }}</td>
-                        <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->order_date)->translatedFormat('d F Y') }}</td>                        <td class="px-6 py-4">{{ $item->rental_duration }} Hari</td>
+                        <td class="px-6 py-4">{{ \Carbon\Carbon::parse($item->order_date)->translatedFormat('d F Y') }}</td>                        
+                        <td class="px-6 py-4">{{ $item->rental_duration }} Hari</td>
                         <td class="px-6 py-4">{{ $item->delivery_address}}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
                         @if($item->payment_status == 'paid')
@@ -61,7 +63,6 @@
                         </td>
                         @endif
                         <td class="px-6 py-4">{{ $item->latestStatus->status_category->status }}</td>
-                        <td class="px-6 py-4">{{ $item->deliverer->name }}</td>
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">
                             <form action="{{ route('dashboard.kelola.order.hapus', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus data order ini?');">
                                 @csrf
@@ -70,7 +71,7 @@
                                     Hapus
                                 </button>
                             </form>
-                            <a href="#" class="inline-block px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none text-center">
+                            <a href="{{ route('dashboard.kelola.order.detail', $item->id) }}" class="inline-block px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none text-center">
                                 Detail
                             </a>
                         </td>
@@ -86,11 +87,14 @@
             </table>
         </div>
     </div>
+    <div class="mt-4">
+        {{ $order->links() }}
+    </div>
 </div>
 
 
 <div id="addOrderModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-screen overflow-y-auto"">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Tambah Order</h2>
 
         <form id="addOrderForm" action="{{ route('dashboard.kelola.order.tambah') }}" method="POST" enctype="multipart/form-data">
@@ -101,10 +105,10 @@
                 <label for="customer_id" class="block text-sm font-medium text-gray-700">Pilih Customer</label>
                 <select name="customer_id" id="customer_id" class="block w-full mt-1 p-2 border rounded-lg" onchange="toggleNewCustomerForm(this)">
                     <option value="">-- Pilih Customer --</option>
+                    <option value="new">+ Tambah Customer Baru</option>
                     @foreach ($customers as $customer)
                         <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->contact_no }}</option>
                     @endforeach
-                    <option value="new">+ Tambah Customer Baru</option>
                 </select>
             </div>
 
@@ -119,18 +123,24 @@
                     <input type="text" name="new_customer_contact" id="new_customer_contact" class="block w-full mt-1 p-2 border rounded-lg">
                 </div>
                 <div class="mb-4">
+                    <label for="new_secondary_customer_contact" class="block text-sm font-medium text-gray-700">Nomor HP Pengganti Customer Baru</label>
+                    <input type="text" name="new_secondary_customer_contact" id="new_secondary_customer_contact" class="block w-full mt-1 p-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
                     <label for="new_customer_email" class="block text-sm font-medium text-gray-700">Email Customer Baru</label>
                     <input type="email" name="new_customer_email" id="new_customer_email" class="block w-full mt-1 p-2 border rounded-lg">
                 </div>
             </div>
 
-            <!-- Rental Duration -->
             <div class="mb-4">
-                <label for="rental_duration" class="block text-sm font-medium text-gray-700">Durasi Rental (Hari)</label>
-                <input type="number" name="rental_duration" id="rental_duration" class="block w-full mt-1 p-2 border rounded-lg" required>
+                <label for="rental_range" class="block text-sm font-medium text-gray-700">Pilih Durasi Sewa</label>
+                <input type="text" id="rental_range" name="rental_range" class="block w-full mt-1 p-2 border rounded-lg" placeholder="--Pilih Rentang Tanggal--" required>
             </div>
 
-            <!-- Delivery Address -->
+            <input type="hidden" name="order_date" id="order_date">
+            <input type="hidden" name="end_date" id="end_date">
+
+
             <div class="mb-4">
                 <label for="delivery_address" class="block text-sm font-medium text-gray-700">Alamat Pengiriman</label>
                 <textarea name="delivery_address" id="delivery_address" rows="3" class="block w-full mt-1 p-2 border rounded-lg" required></textarea>
@@ -143,7 +153,7 @@
                     <select name="plants[0][plant_id]" class="block w-full p-2 border rounded-lg">
                         <option value="">-- Pilih Tanaman --</option>
                         @foreach ($plants as $plant)
-                            <option value="{{ $plant->id }}">{{ $plant->name }}</option>
+                            <option value="{{ $plant->id }}">{{ $plant->name }} -- {{ $plant->category }}</option>
                         @endforeach
                     </select>
 
@@ -183,42 +193,6 @@
 
 
 
-<!-- <div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Plant QR Code</h2>
-
-        <div id="qr-code-inner" class="flex justify-center mb-6">
-        </div>
-
-        <div class="mb-6 space-y-2">
-            <p class="text-sm"><span class="font-medium">Plant ID:</span> <span id="qr-plant-id"></span></p>
-            <p class="text-sm"><span class="font-medium">Name:</span> <span id="qr-plant-name"></span></p>
-        </div>
-
-        <div class="flex justify-between">
-            <button onclick="printQRCode()" class="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Print
-            </button>
-            
-            <button onclick="downloadQRCode()" class="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download
-            </button>
-            
-            <button onclick="closeQRModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg">
-                Close
-            </button>
-        </div>
-    </div>
-</div> -->
-
-
-
 @endsection
 
 @section('scripts')
@@ -245,85 +219,49 @@
     let plantIndex = 1;
 
     function addPlantItem() {
-        const plantsSection = document.getElementById('plantsSection');
+    const plantsSection = document.getElementById('plantsSection');
 
-        const newPlantItem = document.createElement('div');
-        newPlantItem.classList.add('plant-item', 'flex', 'gap-2', 'mb-2');
-        newPlantItem.innerHTML = `
-            <select name="plants[${plantIndex}][plant_id]" class="block w-full p-2 border rounded-lg">
-                <option value="">-- Pilih Tanaman --</option>
-                @foreach ($plants as $plant)
-                    <option value="{{ $plant->id }}">{{ $plant->name }}</option>
-                @endforeach
-            </select>
+    const newPlantItem = document.createElement('div');
+    newPlantItem.className = 'plant-item flex gap-2 mb-2';
+    newPlantItem.innerHTML = `
+        <select name="plants[${plantIndex}][plant_id]" class="block w-full p-2 border rounded-lg">
+            <option value="">-- Pilih Tanaman --</option>
+            @foreach ($plants as $plant)
+                <option value="{{ $plant->id }}">{{ $plant->name }} -- {{ $plant->category }}</option>
+            @endforeach
+        </select>
 
-            <input type="number" name="plants[${plantIndex}][quantity]" placeholder="Jumlah" min="1" class="block w-24 p-2 border rounded-lg">
+        <input type="number" name="plants[${plantIndex}][quantity]" placeholder="Jumlah" min="1" class="block w-24 p-2 border rounded-lg">
 
-            <button type="button" onclick="addPlantItem()" class="bg-green-500 text-white px-2 rounded hover:bg-green-600">
-                +
-            </button>
-        `;
+        <button type="button" class="bg-red-500 text-white px-2 rounded hover:bg-red-600" onclick="this.parentElement.remove()">
+            &times;
+        </button>
+    `;
+    plantsSection.appendChild(newPlantItem);
+    plantIndex++;
+}
 
-        plantsSection.appendChild(newPlantItem);
-        plantIndex++;
-    }
+    flatpickr("#rental_range", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates) {
+            if (selectedDates.length === 2) {
+                document.getElementById('order_date').value = toDateInputValue(selectedDates[0]);
+                
+                // Kurangi satu hari dari tanggal akhir
+                const adjustedEndDate = new Date(selectedDates[1]);
+                adjustedEndDate.setDate(adjustedEndDate.getDate() - 1);
+                document.getElementById('end_date').value = toDateInputValue(adjustedEndDate);
+            }
+        }
+    });
 
-    // function openQRModal(plantId, plantName, qrCodeUrl) {
-    //     document.getElementById('qrCodeModal').classList.remove('hidden');
-
-    //     // Update the plant info
-    //     document.getElementById('qr-plant-id').textContent = plantId;
-    //     document.getElementById('qr-plant-name').textContent = plantName;
-
-    //     // Fetch the QR Code file dynamically
-    //     fetch(qrCodeUrl)
-    //         .then(response => response.text())
-    //         .then(svg => {
-    //             document.getElementById('qr-code-inner').innerHTML = svg;
-    //         });
-    // }
-
-    // function closeQRModal() {
-    //     document.getElementById('qrCodeModal').classList.add('hidden');
-    // }
-
-    // function printQRCode() {
-    //     const printWindow = window.open('', '_blank');
-    //     const qrContent = document.getElementById('qr-code-inner').innerHTML;
-    //     const plantName = document.getElementById('qr-plant-name').textContent;
-    //     const plantId = document.getElementById('qr-plant-id').textContent;
-
-    //     printWindow.document.write(`
-    //         <html>
-    //             <head><title>Print QR Code</title></head>
-    //             <body style="text-align: center; padding-top: 50px;">
-    //                 ${qrContent}
-    //                 <h2>${plantName} (ID: ${plantId})</h2>
-    //             </body>
-    //         </html>
-    //     `);
-    //     printWindow.document.close();
-    //     printWindow.print();
-    // }
-
-    // function downloadQRCode() {
-    //     const svgElement = document.getElementById('qr-code-inner').querySelector('svg');
-    //     if (!svgElement) {
-    //         alert('QR code not found!');
-    //         return;
-    //     }
-
-    //     const svgData = new XMLSerializer().serializeToString(svgElement);
-    //     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    //     const url = URL.createObjectURL(svgBlob);
-
-    //     const link = document.createElement('a');
-    //     link.href = url;
-    //     link.download = 'plant-qr-code.svg';
-    //     document.body.appendChild(link);
-    //     link.click();
-    //     document.body.removeChild(link);
-    //     URL.revokeObjectURL(url);
-    // }
+    const toDateInputValue = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
 </script>
 @endsection

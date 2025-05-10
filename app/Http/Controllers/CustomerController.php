@@ -14,9 +14,15 @@ class CustomerController extends Controller
     public function tampilkanDataCustomer()
     {
         $user = Auth::user();
-        $customers = Customer::withCount('order')
-        ->withSum('order', 'total_price')
-        ->get();
+        $query = Customer::with('orders')
+        ->withCount('orders')
+        ->withSum('orders', 'total_price');
+
+        if (request()->has('search') && request()->search != '') {
+            $query->where('name', 'like', '%' . request()->search . '%');
+        }
+
+        $customers = $query->orderBy('created_at', 'desc')->paginate(15);
         return view('dashboard.customers.index', compact('customers', 'user'));
     }
 
@@ -25,7 +31,8 @@ class CustomerController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'contact_no' => 'required|string|max:15',
-            'email' => 'required|email|unique:customers,email',
+            'secondary_contact_no' => 'nullable|string|max:15',
+            'email' => 'nullable|email|unique:customers,email',
         ]);
 
         DB::beginTransaction();
@@ -50,6 +57,7 @@ class CustomerController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'contact_no' => 'required|string|max:15',
+            'secondary_contact_no' => 'nullable|string|max:15',
             'email' => [
                 'required',
                 'email',

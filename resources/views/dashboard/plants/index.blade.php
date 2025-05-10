@@ -11,8 +11,9 @@
     </div>
 
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 gap-3">
+    <form action="{{ route('dashboard.kelola.plant') }}" method="GET" class="relative w-full md:w-auto">
         <label for="table-search" class="sr-only">Search</label>
-        <div class="relative w-full md:w-auto">
+        <div class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -20,8 +21,9 @@
                         clip-rule="evenodd" />
                 </svg>
             </div>
-            <input type="text" id="table-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for products">
+            <input type="text" name="search" id="table-search" value="{{ request('search') }}" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari Nama Tanaman">
         </div>
+    </form>
 
         <button onclick="openAddModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 md:w-auto text-center">+ Tambah Tanaman</button>
     </div>
@@ -35,6 +37,7 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Photo</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Stock</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Harga</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Kategori</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Action</th>
                     </tr>
                 </thead>
@@ -43,12 +46,19 @@
                     <tr class="border-b last:rounded-b-lg last:border-none hover:bg-orange-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $plant->name }}</td>
                         <td class="px-6 py-4">
-                            <img src="{{ asset('storage/' . $plant->photo) }}" alt="{{ $plant->name }}" class="h-20 w-20 object-cover rounded-lg shadow-sm">
+                            <img src="{{ asset('storage/' . $plant->photo) }}" alt="{{ $plant->name }}" class="h-24 w-24 object-cover rounded-lg shadow-sm">
                         </td>
                         <td class="px-6 py-4">{{ $plant->stock }}</td>
                         <td class="px-6 py-4 font-semibold text-orange-600 dark:text-orange-400">Rp {{ number_format($plant->price, 0, ',', '.') }}</td>
+                        @if ($plant->category == 'kecil')
+                        <td class="px-6 py-4">Kecil</td>
+                        @elseif ($plant->category == 'besar')
+                        <td class="px-6 py-4">Besar</td>
+                        @else
+                        <td class="px-6 py-4">Sedang</td>
+                        @endif
                         <td class="px-6 py-4 space-y-2 md:space-y-0 md:space-x-2 flex flex-col md:flex-row">                
-                            <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }})" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
+                            <a href="#" onclick="openEditModal({{ $plant->id }}, '{{ $plant->name }}', '{{ $plant->photo }}', {{ $plant->stock }}, {{ $plant->price }}, '{{ $plant->category }}')" class="inline-block px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none text-center">Edit</a>
                             <form action="{{ route('dashboard.kelola.plant.hapus', $plant->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Anda yakin ingin menghapus tanaman ini?');">
                                 @csrf
                                 @method('DELETE')
@@ -66,6 +76,9 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="mt-4">
+        {{ $plants->links() }}
     </div>
 </div>
 
@@ -91,6 +104,13 @@
             <div class="mb-4">
                 <label for="price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="price" class="block w-full mt-1 p-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label for="category" class="block text-sm font-medium text-gray-700">Kategori</label>
+                <select name="category" id="category" class="block w-full mt-1 p-2 border rounded-lg">
+                    <option value="kecil">Kecil</option>
+                    <option value="besar">Besar</option>
+                </select>
             </div>
             <div class="flex justify-end">
                 <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
@@ -123,6 +143,13 @@
             <div class="mb-4">
                 <label for="edit-price" class="block text-sm font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="edit-price" class="block w-full mt-1 p-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label for="edit-category" class="block text-sm font-medium text-gray-700">Kategori</label>
+                <select name="category" id="edit-category" class="block w-full mt-1 p-2 border rounded-lg">
+                    <option value="kecil">Kecil</option>
+                    <option value="besar">Besar</option>
+                </select>
             </div>
             <div class="flex justify-end">
                 <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
@@ -183,18 +210,20 @@
     }
 
     // Function to open the edit plant modal with pre-filled data
-    function openEditModal(id, name, photo, stock, price) {
+    function openEditModal(id, name, photo, stock, price, category) {
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
         const editName = document.getElementById('edit-name');
         const editStock = document.getElementById('edit-stock');
         const editPrice = document.getElementById('edit-price');
+        const editCategory = document.getElementById('edit-category');
         const editPhotoPreview = document.getElementById('edit-photo-preview');
 
         // Set form values
         editName.value = name;
         editStock.value = stock;
         editPrice.value = price;
+        editCategory.value = category;
         
         // Set the form action with the correct URL and ID
         editForm.action = `/dashboard/plant/${id}`;
