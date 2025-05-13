@@ -29,7 +29,7 @@ class LoginController extends Controller
             $request->session()->regenerate(); // regenerate session untuk keamanan
             $user = Auth::user();
     
-            if ($user->role === 'admin') {
+            if ($user->role === 'admin' || $user->role === 'super admin') {
                 return redirect()->route('dashboard.index');
             } elseif ($user->role === 'delivery') {
                 return redirect()->route('dashboard.kelola.delivery');
@@ -48,14 +48,25 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
-    public function tampilkanRegister()
+    public function tampilkanKelolaUser()
     {
-        return view('auth.register');
+        $user = Auth::user();
+        if ($user->role == 'super admin')
+        {
+            $allUser = User::all();
+        } else 
+        {
+            $allUser = User::where('role', 'delivery')->get();
+        }
+        return view('auth.user', compact('user', 'allUser'));
     }
 
     public function register(Request $request)
-    {
-        $validatedData = $request->validate([
+    {   
+        $user = Auth::user();
+
+        try {
+            $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -66,6 +77,24 @@ class LoginController extends Controller
 
         User::create($validatedData);
 
-        return redirect('/login')->with('success', 'Registrasi berhasil. Silakan login.');
+        return redirect('dashboard.kelola.user')->with('success', 'Registrasi berhasil. Silakan login menggunakan akun tersebut.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.']);
+        }
+    }
+
+    public function hapusUser($id)
+    {
+        try {
+            $user = Auth::user();
+            if ($user->id == $id) {
+                return redirect()->back()->withErrors(['error' => 'Anda tidak dapat menghapus akun Anda sendiri.']);
+            }
+            $user = User::findOrFail($id);
+            $user->delete();
+            return redirect()->back()->with('success', 'User berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat memeriksa pengguna.']);
+        }
     }
 }

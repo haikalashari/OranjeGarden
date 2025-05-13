@@ -13,7 +13,7 @@
 <body class="bg-gray-50 dark:bg-gray-900">
 
     @include('layouts.partials.header')     <!-- Navbar -->
-    @if (Auth::user()->role === 'admin')
+    @if (Auth::user()->role === 'admin' || Auth::user()->role === 'super admin')
         @include('layouts.partials.sidebar') <!-- Sidebar untuk Admin -->
     @elseif (Auth::user()->role === 'delivery')
         @include('layouts.partials.sidebar_deliverer') <!-- Sidebar untuk Delivery -->

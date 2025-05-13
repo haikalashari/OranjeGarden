@@ -56,13 +56,6 @@
       <div>
         <button type="submit" class="btn-orange w-full py-2 rounded-lg text-sm font-semibold">Masuk</button>
       </div>
-
-      <!-- Register Link -->
-      <div class="text-center">
-        <p class="text-sm text-gray-600">Belum punya akun?
-          <a href="{{ route('register') }}" class="text-orange-500 hover:underline font-medium">Daftar di sini</a>
-        </p>
-      </div>
     </form>
   </div>
 

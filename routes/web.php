@@ -16,8 +16,14 @@ Route::middleware('guest')->group(function () {
     Route::controller(LoginController::class)->group(function () {
         Route::get('/login', [LoginController::class, 'tampilkanLogin'])->name('login');
         Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
-        Route::get('/register', [LoginController::class, 'tampilkanRegister'])->name('register');
+    });
+});
+
+Route::middleware('auth', 'role:admin,super admin')->group(function () {
+    Route::controller(LoginController::class)->group(function () {
+        Route::get('/dashboard/users', [LoginController::class, 'tampilkanKelolaUser'])->name('dashboard.kelola.user');
         Route::post('/register', [LoginController::class, 'register'])->name('register.submit');
+        Route::delete('/dashboard/users/hapus/{id}', [LoginController::class, 'hapusUser'])->name('dashboard.kelola.user.hapus');
     });
 });
 
@@ -26,7 +32,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
-Route::middleware('auth', 'role:admin')->group(function () {
+Route::middleware('auth', 'role:admin,super admin')->group(function () {
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/dashboard', 'tampilkanDashboard')->name('dashboard.index');
     });
@@ -62,7 +68,7 @@ Route::middleware('auth', 'role:admin')->group(function () {
     });
 });
 
-Route::middleware(['auth', 'role:admin,delivery'])->group(function () {
+Route::middleware(['auth', 'role:admin,delivery,super admin'])->group(function () {
     Route::controller(DeliveryController::class)->group(function () {
         Route::get('/dashboard/deliveries', 'tampilkanDataDelivery')->name('dashboard.kelola.delivery');
         Route::get('/dashboard/deliveries/{id}', 'tampilkanDetailDelivery')->name('dashboard.kelola.delivery.detail');

@@ -30,6 +30,14 @@ class UsersTableSeeder extends Seeder
             'role' => 'delivery',
         ]);
 
+        // Create super admin user
+        User::factory()->create([
+            'name' => 'Super Admin User',
+            'email' => 'superadmin@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'super admin',
+        ]);
+
         // Create random users
         User::factory()
             ->count(8)

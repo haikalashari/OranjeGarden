@@ -25,7 +25,6 @@ class OrderController extends Controller
         $user = Auth::user();
         $query = Order::with(['customer', 'latestStatus.status_category']);
 
-        // Check if a search query exists
         if ($request->has('search') && $request->search != '') {
             $query->whereHas('customer', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%');
@@ -36,7 +35,9 @@ class OrderController extends Controller
         $customers = Customer::all();
         $plants = Plant::all();
         $deliverers = User::where('role', 'delivery ')->get();
-        return view('dashboard.orders.index', compact('order', 'user', 'customers', 'deliverers', 'plants'));
+        $statuses = StatusCategory::all(); 
+
+        return view('dashboard.orders.index', compact('order', 'user', 'customers', 'deliverers', 'plants', 'statuses'));
     } 
 
     public function tambahOrder(Request $request)
@@ -213,7 +214,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         $validatedData = $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Validasi file gambar
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048', 
         ]);
 
         try {
