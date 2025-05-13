@@ -42,7 +42,7 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Total Harga Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Pembayaran</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Status Order</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Action</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800">

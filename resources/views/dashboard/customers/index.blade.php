@@ -38,7 +38,7 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Email</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Order</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Total Pengeluaran Uang</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Action</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800">

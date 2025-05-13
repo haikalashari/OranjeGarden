@@ -38,7 +38,7 @@
                         <th scope="col" class="px-6 py-3 font-semibold">Stock</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Harga</th>
                         <th scope="col" class="px-6 py-3 font-semibold">Kategori</th>
-                        <th scope="col" class="px-6 py-3 font-semibold">Action</th>
+                        <th scope="col" class="px-6 py-3 font-semibold">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800">
