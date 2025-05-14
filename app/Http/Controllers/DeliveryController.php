@@ -16,7 +16,7 @@ class DeliveryController extends Controller
     public function tampilkanDataDelivery()
     {
         $user = Auth::user();
-        if($user->role == 'admin')
+        if($user->role == 'admin' || $user->role == 'super admin')
         {
             $orders = Order::whereHas('latestStatus.status_category', function ($query) {
                 $query->whereIn('status', [
