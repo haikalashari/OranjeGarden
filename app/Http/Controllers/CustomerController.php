@@ -33,6 +33,15 @@ class CustomerController extends Controller
             'contact_no' => 'required|string|max:15',
             'secondary_contact_no' => 'nullable|string|max:15',
             'email' => 'nullable|email|unique:customers,email',
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'contact_no.required' => 'Nomor kontak wajib diisi.',
+            'contact_no.string' => 'Nomor kontak harus berupa string.',
+            'contact_no.max' => 'Nomor kontak tidak boleh lebih dari 15 karakter.',
+            'secondary_contact_no.string' => 'Nomor kontak sekunder harus berupa string.',
+            'secondary_contact_no.max' => 'Nomor kontak sekunder tidak boleh lebih dari 15 karakter.',
+            'email.email' => 'Email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
         ]);
 
         DB::beginTransaction();
@@ -63,6 +72,14 @@ class CustomerController extends Controller
                 'email',
                 Rule::unique('customers', 'email')->ignore($customer->id),
             ],
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'contact_no.required' => 'Nomor kontak wajib diisi.',
+            'contact_no.max' => 'Nomor kontak tidak boleh lebih dari 15 karakter.',
+            'secondary_contact_no.max' => 'Nomor kontak sekunder tidak boleh lebih dari 15 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
         ]);
 
         DB::beginTransaction();

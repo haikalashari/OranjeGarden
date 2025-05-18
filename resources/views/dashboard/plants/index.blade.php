@@ -109,6 +109,7 @@
                 <label for="category" class="block text-sm font-medium text-gray-700">Kategori</label>
                 <select name="category" id="category" class="block w-full mt-1 p-2 border rounded-lg">
                     <option value="kecil">Kecil</option>
+                    <option value="sedang">Sedang</option>
                     <option value="besar">Besar</option>
                 </select>
             </div>
@@ -148,6 +149,7 @@
                 <label for="edit-category" class="block text-sm font-medium text-gray-700">Kategori</label>
                 <select name="category" id="edit-category" class="block w-full mt-1 p-2 border rounded-lg">
                     <option value="kecil">Kecil</option>
+                    <option value="sedang">Sedang</option>
                     <option value="besar">Besar</option>
                 </select>
             </div>

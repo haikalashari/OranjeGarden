@@ -20,9 +20,9 @@
     @endif
 
     <main class="p-4 sm:ml-64 mt-16">
-        @if (session('error'))
+        @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
-                {{ session('error') }}
+                {{ $errors->first() }}
             </div>
         @endif
 

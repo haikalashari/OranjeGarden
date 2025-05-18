@@ -60,6 +60,16 @@ class OrderController extends Controller
             'plants' => 'required|array|min:1',
             'plants.*.plant_id' => 'required|exists:plants,id',
             'plants.*.quantity' => 'required|integer|min:1',
+        ], [
+            'customer_id.required' => 'Pilih customer.',
+            'new_customer_name.string' => 'Nama customer harus berupa string.',
+            'new_customer_contact.string' => 'Nomor kontak harus berupa string.',
+            'new_customer_email.email' => 'Email tidak valid.',
+            'order_date.required' => 'Tanggal order wajib diisi.',
+            'end_date.required' => 'Tanggal akhir wajib diisi.',
+            'delivery_address.required' => 'Alamat pengiriman wajib diisi.',
+            'payment_proof.image' => 'Bukti pembayaran harus berupa gambar.',
+            'plants.required' => 'Tanaman wajib dipilih.',
         ]);
         
         try {
@@ -185,6 +195,13 @@ class OrderController extends Controller
             'items' => 'required|array',
             'items.*.plant_id' => 'required|exists:plants,id',
             'items.*.quantity' => 'required|integer|min:1',
+        ], [
+            'items.required' => 'Tanaman wajib dipilih.',
+            'items.*.plant_id.required' => 'ID tanaman wajib diisi.',
+            'items.*.plant_id.exists' => 'Tanaman tidak ditemukan.',
+            'items.*.quantity.required' => 'Jumlah tanaman wajib diisi.',
+            'items.*.quantity.integer' => 'Jumlah tanaman harus berupa angka.',
+            'items.*.quantity.min' => 'Jumlah tanaman minimal 1.',
         ]);
 
         $order = Order::findOrFail($id);
@@ -215,6 +232,10 @@ class OrderController extends Controller
 
         $validatedData = $request->validate([
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048', 
+        ], [
+            'payment_proof.required' => 'Bukti pembayaran wajib diunggah.',
+            'payment_proof.image' => 'File yang diunggah harus berupa gambar.',
+            'payment_proof.mimes' => 'Format gambar yang diperbolehkan: jpeg, png, jpg.',
         ]);
 
         try {
@@ -372,6 +393,14 @@ class OrderController extends Controller
             'plants.*.plant_id' => 'required|exists:plants,id',
             'plants.*.quantity' => 'required|integer|min:1',
             'deliverer_id' => 'required|exists:users,id',
+        ], [
+            'plants.required' => 'Tanaman wajib dipilih.',
+            'plants.*.plant_id.required' => 'ID tanaman wajib diisi.',
+            'plants.*.plant_id.exists' => 'Tanaman tidak ditemukan.',
+            'plants.*.quantity.required' => 'Jumlah tanaman wajib diisi.',
+            'plants.*.quantity.integer' => 'Jumlah tanaman harus berupa angka.',
+            'plants.*.quantity.min' => 'Jumlah tanaman minimal 1.',
+            'deliverer_id.required' => 'Pengantar wajib dipilih.',
         ]);
 
         try {
@@ -431,6 +460,9 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'deliverer_id' => 'required|exists:users,id',
+        ], [
+            'deliverer_id.required' => 'Pengantar wajib dipilih.',
+            'deliverer_id.exists' => 'Pengantar tidak ditemukan.',
         ]);
 
         try {

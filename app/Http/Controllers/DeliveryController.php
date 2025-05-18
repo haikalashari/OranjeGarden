@@ -65,6 +65,10 @@ class DeliveryController extends Controller
 
         $request->validate([
             'delivery_photo' => 'required|image|mimes:jpg,jpeg,png',
+        ], [
+            'delivery_photo.required' => 'Foto pengantaran wajib diunggah.',
+            'delivery_photo.image' => 'File yang diunggah harus berupa gambar.',
+            'delivery_photo.mimes' => 'Format gambar yang diperbolehkan: jpg, jpeg, png.',
         ]);
     
         $user = Auth::user();
