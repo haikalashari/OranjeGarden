@@ -21,7 +21,7 @@ class UpdateOrderStatus extends Command
         foreach ($orders as $order) {
             $today = Carbon::today();
             $orderDate = Carbon::parse($order->order_date);
-            $endDate = Carbon::parse($order->end_date)->subDay();
+            $endDate = Carbon::parse($order->end_date);
             $rentalDuration = $orderDate->diffInDays($endDate);
             $daySinceStart = $orderDate->diffInDays($today) + 1;
             $currentStatus = $order->latestStatus->status_category->status ?? null;

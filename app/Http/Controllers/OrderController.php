@@ -94,12 +94,24 @@ class OrderController extends Controller
                 if ($plant->stock < $plantData['quantity']) {
                     throw new \Exception("Stok tanaman {$plant->name} tidak mencukupi.");
                 }
+            }
+
+            foreach ($validatedData['plants'] as $plantData) {
+                $plant = Plant::findOrFail($plantData['plant_id']);
 
                 $plant->stock -= $plantData['quantity'];
                 $plant->save();
 
                 $totalPrice += $plant->price * $plantData['quantity'];
             }
+
+            $startDate = Carbon::parse($validatedData['order_date']);
+            $endDate = Carbon::parse($validatedData['end_date']);
+            $daysDiff = $startDate->diffInDays($endDate);
+
+            $fullMonths = intdiv($daysDiff, 29); 
+            $monthMultiplier = max(1, $fullMonths);
+            $totalPrice *= $monthMultiplier;
             
             $paymentStatus = 'unpaid';
             if ($request->hasFile('payment_proof')) {
@@ -291,6 +303,10 @@ class OrderController extends Controller
 
             $orderItems = OrderItem::where('order_id', $id)->get();
             foreach ($orderItems as $item) {
+                $plant = Plant::findOrFail($item->plant_id);
+                $plant->stock += $item->quantity;
+                $plant->save();
+
                 $item->delete();
             }
 
@@ -336,6 +352,14 @@ class OrderController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
+        $lastItemBatch = $order->orderItems()->max('replacement_batch');
+        $lastBatch = $order->orderItems()->where('replacement_batch', $lastItemBatch)->get();
+        foreach ($lastBatch as $item) {
+            $plant = Plant::findOrFail($item->plant_id);
+            $plant->stock += $item->quantity;
+            $plant->save();
+        }
+
         $orderDeliverers = OrderDeliverers::where('order_id', $id)->get();
         foreach ($orderDeliverers as $deliverer) {
             $deliverer->update([
@@ -370,6 +394,14 @@ class OrderController extends Controller
             'status_id' => 6, // ID untuk status "Order Dibatalkan"
             'created_at' => Carbon::now(),
         ]);
+
+        $lastBatch = $order->orderItems()->max('replacement_batch');
+        $lastBatch = $order->orderItems()->where('replacement_batch', $lastBatch)->get();
+        foreach ($lastBatch as $item) {
+            $plant = Plant::findOrFail($item->plant_id);
+            $plant->stock += $item->quantity;
+            $plant->save();
+        }
 
         $orderDeliverers = OrderDeliverers::where('order_id', $id)->get();
         foreach ($orderDeliverers as $deliverer) {
@@ -406,13 +438,6 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
             $order = Order::findOrFail($id);
-
-            $previousBatch = $order->orderItems()->where('replacement_batch', $order->orderItems()->max('replacement_batch'))->get();
-            foreach ($previousBatch as $item) {
-                $plant = Plant::findOrFail($item->plant_id);
-                $plant->stock += $item->quantity;
-                $plant->save();
-            }
 
             foreach ($validated['plants'] as $plantData) {
                 $plant = Plant::findOrFail($plantData['plant_id']);
@@ -508,20 +533,26 @@ class OrderController extends Controller
             ];
 
             $totalAmount = 0;
+            $startDate = \Carbon\Carbon::parse($order->order_date);
+            $endDate = \Carbon\Carbon::parse($order->end_date);
+            $daysDiff = $startDate->diffInDays($endDate);
+            $fullMonths = intdiv($daysDiff, 29);
+            $monthMultiplier = max(1, $fullMonths);
 
-            // Kelompokkan order items berdasarkan kategori dan hitung total quantity dan amount
-            foreach ($order->orderItems->where('replacement_batch', 0) as $item) { // Hanya batch 0
+            foreach ($order->orderItems->where('replacement_batch', 0) as $item) {
                 $category = $item->plant->category ?? 'Uncategorized';
-                $amount = $item->quantity * $item->plant->price;
+                $unitPrice = $item->plant->price;
+                $quantity = $item->quantity;
+                $amount = $quantity * $unitPrice * $monthMultiplier;
 
                 if ($category === 'kecil') {
-                    $groupedItems['tanaman kecil']['quantity'] += $item->quantity;
+                    $groupedItems['tanaman kecil']['quantity'] += $quantity;
                     $groupedItems['tanaman kecil']['amount'] += $amount;
                 } elseif ($category === 'sedang') {
-                    $groupedItems['tanaman sedang']['quantity'] += $item->quantity;
+                    $groupedItems['tanaman sedang']['quantity'] += $quantity;
                     $groupedItems['tanaman sedang']['amount'] += $amount;
                 } elseif ($category === 'besar') {
-                    $groupedItems['tanaman besar']['quantity'] += $item->quantity;
+                    $groupedItems['tanaman besar']['quantity'] += $quantity;
                     $groupedItems['tanaman besar']['amount'] += $amount;
                 }
 

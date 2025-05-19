@@ -159,6 +159,7 @@
             </div>
 
                         <!-- Tombol Order Selesai dan Order Dibatalkan -->
+            @if ($order->latestStatus->status_category->status !== 'Proses Penggantian Tanaman')
             <div class="flex gap-4 mt-4">
                 <!-- Tombol Order Selesai -->
                 <form action="{{ route('dashboard.kelola.order.selesai', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan order ini?')">
@@ -178,6 +179,7 @@
                     </button>
                 </form>
             </div>
+            @endif
 
         </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">

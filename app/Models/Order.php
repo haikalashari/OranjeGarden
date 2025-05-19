@@ -66,6 +66,6 @@ class Order extends Model
     public function getRentalDurationAttribute()
     {
         return \Carbon\Carbon::parse($this->order_date)
-            ->diffInDays(\Carbon\Carbon::parse($this->end_date)->subDay()) + 1;
+            ->diffInDays(\Carbon\Carbon::parse($this->end_date)) + 1;
     }
 }

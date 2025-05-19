@@ -92,10 +92,25 @@ class DeliveryController extends Controller
             $latestStatus = $order->latestStatus; 
             $status = $latestStatus->status_category->status ?? null;
     
-            if ($status === 'Proses Pengantaran' || $status === 'Proses Penggantian Tanaman') {
+            if ($status === 'Proses Pengantaran') {
                 OrderStatus::create([
                     'order_id' => $order->id,
                     'status_id' => 2, // Order Dalam Masa Sewa
+                ]);
+            } elseif ($status === 'Proses Penggantian Tanaman') {
+                $maxBatch = $order->orderItems()->max('replacement_batch');
+                $olderBatch = $order->orderItems()
+                    ->where('replacement_batch', $maxBatch - 1)
+                    ->get();
+                foreach ($olderBatch as $item) {
+                    $plant = Plant::findOrFail($item->plant_id);
+                    $plant->stock += $item->quantity;
+                    $plant->save();
+                }
+
+                OrderStatus::create([
+                    'order_id' => $order->id,
+                    'status_id' => 2, // Order Proses Pengambilan Kembali
                 ]);
             } elseif ($status === 'Proses Pengambilan Kembali') {
                 $lastBatch = $order->orderItems()->where('replacement_batch', $order->orderItems()->max('replacement_batch'))->get();
@@ -113,10 +128,10 @@ class DeliveryController extends Controller
     
             DB::commit();
     
-            return redirect()->route('dashboard.kelola.delivery')->with('success', 'Delivery confirmed successfully.');
+            return redirect()->route('dashboard.kelola.delivery')->with('success', 'Konfirmasi Pengantaran Berhasil.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal mengkonfirmasi delivery: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal Konfirmasi Pengantaran: ' . $e->getMessage());
         }
     }
 }

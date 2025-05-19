@@ -70,8 +70,7 @@ class LoginController extends Controller
     {   
         $user = Auth::user();
 
-        try {
-            $validatedData = $request->validate([
+        $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -88,11 +87,13 @@ class LoginController extends Controller
             'role.in' => 'Role harus salah satu dari: admin, delivery.',
         ]);
 
+        try {
+
         $validatedData['password'] = bcrypt($validatedData['password']); 
 
         User::create($validatedData);
 
-        return redirect('dashboard.kelola.user')->with('success', 'Registrasi berhasil. Silakan login menggunakan akun tersebut.');
+        return redirect()->back()->with('success', 'Registrasi berhasil. Silakan login menggunakan akun tersebut.');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.']);
         }
