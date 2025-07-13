@@ -58,6 +58,7 @@ Route::middleware('auth', 'role:admin,super admin')->group(function () {
         Route::get('/dashboard/orders/{id}/generateInvoice', 'generateInvoice')->name('dashboard.kelola.order.generate.invoice');
         Route::post('/dashboard/orders/{id}/edit-payment-proof', 'editPaymentProof')->name('dashboard.kelola.order.editPaymentProof');
         Route::delete('/dashboard/orders/{id}/delete-payment-proof', 'deletePaymentProof')->name('dashboard.kelola.order.deletePaymentProof');
+        Route::put('/dashboard/orders/{order}/edit-batch/{batch}', 'editTanamanBatchBaru')->name('dashboard.kelola.order.edit.tanamanbatch');
     });
 
     Route::controller(CustomerController::class)->group(function () {

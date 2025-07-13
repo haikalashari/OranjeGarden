@@ -21,14 +21,14 @@
                 {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                 {{ $order->payment_status === 'paid' ? 'Sudah Dibayar' : 'Belum Dibayar' }}
             </span>
-            <!-- Button Edit Order -->
+            <!-- Button Edit Order
 
             @if ($order->latestStatus->status_category->status === 'Proses Pengantaran')
             <a href="{{ route('dashboard.kelola.order.edit.tampilkan', $order->id) }}" 
                class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
                 Edit Order
             </a>
-            @endif
+            @endif -->
         </div>
     </div>
 
@@ -67,13 +67,21 @@
 
                     <!-- Tombol Tambah Tanaman Batch Baru -->
                     @if ($order->latestStatus->status_category->status === 'Proses Penggantian Tanaman')
-                        <button onclick="openAddBatchModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
-                            + Tambah Tanaman Batch Baru
-                        </button>
+                        @if ($pendingBatchDeliverer)
+                            <!-- Tombol Ubah Batch Baru -->
+                            <button onclick="openEditBatchModal()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                                Ubah Tanaman Batch Baru
+                            </button>
+                        @else
+                            <!-- Tombol Tambah Batch Baru -->
+                            <button onclick="openAddBatchModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                                + Tambah Tanaman Batch Baru
+                            </button>
+                        @endif
                     @endif
 
                         <!-- Tombol Assign Deliverer Pengambilan Kembali -->
-                    @if ($order->latestStatus->status_category->status === 'Proses Pengambilan Kembali')
+                    @if ($order->latestStatus->status_category->status === 'Proses Pengambilan Kembali' && !$pendingPickupDeliverer)
                         <button onclick="openAssignDelivererModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                             Assign Deliverer Pengambilan Kembali
                         </button>
@@ -158,8 +166,9 @@
                 </div>
             </div>
 
-                        <!-- Tombol Order Selesai dan Order Dibatalkan -->
-            @if ($order->latestStatus->status_category->status !== 'Proses Penggantian Tanaman')
+            <!-- Tombol Order Selesai dan Order Dibatalkan -->
+            @if ($order->latestStatus->status_category->status !== 'Proses Penggantian Tanaman' && 
+                $order->latestStatus->status_category->status !== 'Proses Pengambilan Kembali')
             <div class="flex gap-4 mt-4">
                 <!-- Tombol Order Selesai -->
                 <form action="{{ route('dashboard.kelola.order.selesai', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan order ini?')">
@@ -256,6 +265,63 @@
             </form>
         </div>
     </div>
+
+    @if($pendingBatchDeliverer)
+    <!-- Modal Ubah Tanaman Batch Baru -->
+    <div id="editBatchModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-screen overflow-y-auto">
+            <h2 class="text-2xl font-bold text-yellow-600 mb-4">Ubah Tanaman Batch Baru</h2>
+
+            <form id="editBatchForm" action="{{ route('dashboard.kelola.order.edit.tanamanbatch', [$order->id, $pendingBatchDeliverer->delivery_batch]) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <!-- Pilih Deliverer -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Deliverer</label>
+                    <select name="deliverer_id" class="block w-full p-2 border rounded-lg">
+                        <option value="">-- Pilih Deliverer --</option>
+                        @foreach ($deliverers as $deliverer)
+                            <option value="{{ $deliverer->id }}" {{ $pendingBatchDeliverer->user_id == $deliverer->id ? 'selected' : '' }}>
+                                {{ $deliverer->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Pilih Tanaman -->
+                <div id="editPlantsSection" class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Tanaman & Jumlah</label>
+                    @foreach ($order->orderItems->where('replacement_batch', $pendingBatchDeliverer->delivery_batch) as $i => $item)
+                    <div class="plant-item flex gap-2 mb-2">
+                        <select name="plants[{{ $i }}][plant_id]" class="block w-full p-2 border rounded-lg">
+                            <option value="">-- Pilih Tanaman --</option>
+                            @foreach ($plants as $plant)
+                                <option value="{{ $plant->id }}" {{ $item->plant_id == $plant->id ? 'selected' : '' }}>
+                                    {{ $plant->name }} -- {{ $plant->category }}
+                            </option>
+                            @endforeach
+                        </select>
+                        <input type="number" name="plants[{{ $i }}][quantity]" value="{{ $item->quantity }}" placeholder="Jumlah" min="1" class="block w-24 p-2 border rounded-lg">
+                        <button type="button" class="bg-red-500 text-white px-2 rounded hover:bg-red-600" onclick="this.parentElement.remove()">
+                            &times;
+                        </button>
+                    </div>
+                    @endforeach
+                    <button type="button" onclick="addEditPlantItem()" class="bg-yellow-500 text-white px-2 rounded hover:bg-yellow-600">
+                        +
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeEditBatchModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-lg">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 
     <div id="assignDelivererModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-screen overflow-y-auto">
@@ -358,6 +424,34 @@
         `;
         plantsSection.appendChild(newPlantItem);
         plantIndex++;
+    }
+
+    function openEditBatchModal() {
+        document.getElementById('editBatchModal').classList.remove('hidden');
+    }
+
+    function closeEditBatchModal() {
+        document.getElementById('editBatchModal').classList.add('hidden');
+    }
+
+    function addEditPlantItem() {
+        const editPlantsSection = document.getElementById('editPlantsSection');
+        const newPlantItem = document.createElement('div');
+        newPlantItem.className = 'plant-item flex gap-2 mb-2';
+        newPlantItem.innerHTML = `
+            <select name="plants[${editPlantIndex}][plant_id]" class="block w-full p-2 border rounded-lg">
+                <option value="">-- Pilih Tanaman --</option>
+                @foreach ($plants as $plant)
+                    <option value="{{ $plant->id }}">{{ $plant->name }} -- {{ $plant->category }}</option>
+                @endforeach
+            </select>
+            <input type="number" name="plants[${editPlantIndex}][quantity]" placeholder="Jumlah" min="1" class="block w-24 p-2 border rounded-lg">
+            <button type="button" class="bg-red-500 text-white px-2 rounded hover:bg-red-600" onclick="this.parentElement.remove()">
+                &times;
+            </button>
+        `;
+        editPlantsSection.appendChild(newPlantItem);
+        editPlantIndex++;
     }
 
     function openAssignDelivererModal() {

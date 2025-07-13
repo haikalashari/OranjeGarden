@@ -126,7 +126,7 @@
 
             <!-- Invoice Period -->
             <div class="invoice-period">
-                <p>{{ \Carbon\Carbon::parse($order->start_date)->translatedFormat('d F Y') }}<br>
+                <p>{{ \Carbon\Carbon::parse($order->order_date)->translatedFormat('d F Y') }}<br>
                    s/d {{ \Carbon\Carbon::parse($order->end_date)->translatedFormat('d F Y') }}</p>
             </div>
         </div>

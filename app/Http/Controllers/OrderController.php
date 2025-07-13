@@ -123,7 +123,7 @@ class OrderController extends Controller
 
             $order = Order::create([
                 'customer_id' => $customerId,
-                'order_date' => Carbon::now(),
+                'order_date' => $validatedData['order_date'],
                 'end_date' => $validatedData['end_date'],
                 'delivery_address' => $validatedData['delivery_address'],
                 'payment_status' => $paymentStatus,
@@ -185,9 +185,21 @@ class OrderController extends Controller
 
         $deliveries = $order->deliverer()->get();
 
+        $lastBatchNumber = $order->orderItems->max('replacement_batch');
+        $pendingBatchDeliverer = $order->deliverer
+            ->where('delivery_batch', $lastBatchNumber)
+            ->where('status', 'Mengganti')
+            ->whereNull('delivery_photo')
+            ->first();
+
+        $pendingPickupDeliverer = $order->deliverer
+            ->where('status', 'Ambil Kembali')
+            ->whereNull('delivery_photo')
+            ->first();
+
         $invoices = $order->invoices()->get();
 
-        return view('dashboard.orders.detail', compact('user', 'order', 'orderStatuses', 'deliveries', 'invoices', 'plants', 'deliverers'));
+        return view('dashboard.orders.detail', compact('user', 'order', 'orderStatuses', 'deliveries', 'invoices', 'plants', 'deliverers', 'pendingBatchDeliverer', 'lastBatchNumber', 'pendingPickupDeliverer'));
     }
     
     public function tampilkanEditOrder($id)
@@ -348,7 +360,7 @@ class OrderController extends Controller
 
         OrderStatus::create([
             'order_id' => $id,
-            'status_id' => 5, // ID untuk status "Order Selesai"
+            'status_id' => 5, 
             'created_at' => Carbon::now(),
         ]);
 
@@ -622,6 +634,76 @@ class OrderController extends Controller
             // Rollback transaksi jika terjadi error
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal membuat invoice: ' . $e->getMessage());
+        }
+    }
+
+    public function editTanamanBatchBaru(Request $request, $orderId, $batch)
+    {
+        $validated = $request->validate([
+            'plants' => 'required|array',
+            'plants.*.plant_id' => 'required|exists:plants,id',
+            'plants.*.quantity' => 'required|integer|min:1',
+            'deliverer_id' => 'required|exists:users,id',
+        ], [
+            'plants.required' => 'Tanaman wajib dipilih.',
+            'plants.*.plant_id.required' => 'ID tanaman wajib diisi.',
+            'plants.*.plant_id.exists' => 'Tanaman tidak ditemukan.',
+            'plants.*.quantity.required' => 'Jumlah tanaman wajib diisi.',
+            'plants.*.quantity.integer' => 'Jumlah tanaman harus berupa angka.',
+            'plants.*.quantity.min' => 'Jumlah tanaman minimal 1.',
+            'deliverer_id.required' => 'Pengantar wajib dipilih.',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $order = Order::findOrFail($orderId);
+
+            // Pastikan batch belum dikonfirmasi delivery
+            $batchDeliverer = $order->deliverer()
+                ->where('delivery_batch', $batch)
+                ->where('status', 'Mengganti')
+                ->whereNull('delivery_photo')
+                ->first();
+
+            if (!$batchDeliverer) {
+                return redirect()->back()->with('error', 'Batch sudah dikonfirmasi, tidak dapat diubah.');
+            }
+
+            // Hapus orderItems batch ini
+           $orderItemsBatch = $order->orderItems()->where('replacement_batch', $batch)->get();
+            foreach ($orderItemsBatch as $item) {
+                $plant = Plant::findOrFail($item->plant_id);
+                $plant->stock += $item->quantity;
+                $plant->save();
+                $item->delete();
+            }
+
+            // Tambahkan orderItems baru
+            foreach ($validated['plants'] as $plantData) {
+                $plant = Plant::findOrFail($plantData['plant_id']);
+                if ($plant->stock < $plantData['quantity']) {
+                    throw new \Exception("Stok tanaman {$plant->name} tidak mencukupi.");
+                }
+                $plant->stock -= $plantData['quantity'];
+                $plant->save();
+
+                $order->orderItems()->create([
+                    'plant_id' => $plantData['plant_id'],
+                    'quantity' => $plantData['quantity'],
+                    'replacement_batch' => $batch,
+                ]);
+            }
+
+            // Update deliverer batch
+            $batchDeliverer->user_id = $validated['deliverer_id'];
+            $batchDeliverer->save();
+
+            DB::commit();
+            return redirect()->route('dashboard.kelola.order.detail', $order->id)->with('success', 'Batch baru berhasil diubah.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal mengubah batch baru: ' . $e->getMessage());
         }
     }
 }
